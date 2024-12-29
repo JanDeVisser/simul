@@ -56,9 +56,9 @@ struct NorGate : public OrGate {
 };
 
 struct XorGate : public Device {
-    Pin *a1;
-    Pin *a2;
-    Pin *y;
+    Pin *A1;
+    Pin *A2;
+    Pin *Y;
 
     explicit XorGate(std::string const &ref = "");
     void simulate(duration) override;

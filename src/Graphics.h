@@ -225,6 +225,34 @@ struct DIP : public Package<S> {
     }
 };
 
+template<typename D, typename P>
+inline void connect(D const &device, P package)
+{
+    static_assert(false);
+}
+
+template<typename D, typename P>
+inline void connect(D *device, P package)
+{
+    static_assert(false);
+}
+
+template<typename P, size_t S>
+    requires std::derived_from<P, Package<S>>
+inline void connect(std::array<Pin *, S> device, P *package)
+{
+    for (auto ix = 0; ix < S; ++ix) {
+        package->pins[ix] = device[ix];
+    }
+}
+
+template<typename P>
+    requires std::derived_from<P, Package<1>>
+inline void connect(Pin *device, P *package)
+{
+    package->pins[0] = device;
+}
+
 struct Board {
     Vector2                                       size {};
     std::vector<std::unique_ptr<AbstractPackage>> packages {};
@@ -264,34 +292,17 @@ struct Board {
         packages.emplace_back(dynamic_cast<AbstractPackage *>(ptr));
         return ptr;
     }
-};
 
-template<typename D, typename P>
-inline void connect(D const &device, P package)
-{
-    static_assert(false);
-}
-
-template<typename D, typename P>
-inline void connect(D *device, P package)
-{
-    static_assert(false);
-}
-
-template<typename P, size_t S>
-    requires std::derived_from<P, Package<S>>
-inline void connect(std::array<Pin *, S> device, P *package)
-{
-    for (auto ix = 0; ix < S; ++ix) {
-        package->pins[ix] = device[ix];
+    template<class D, class P, typename... Args>
+    P *add_device(D *device, Args &&...args)
+    {
+        auto *ptr = new P(args...);
+        size.x = std::max(size.x, ptr->rect.x + ptr->rect.width + PITCH);
+        size.y = std::max(size.y, ptr->rect.y + ptr->rect.height + PITCH);
+        packages.emplace_back(dynamic_cast<AbstractPackage *>(ptr));
+        connect(device, ptr);
+        return ptr;
     }
-}
-
-template<typename P>
-    requires std::derived_from<P, Package<1>>
-inline void connect(Pin *device, P *package)
-{
-    package->pins[0] = device;
-}
+};
 
 }

@@ -15,10 +15,14 @@ add_executable(
         src/Graphics.h
         src/Pin.cpp
         src/Device.h
-        src/LS139.cpp
         src/Circuit.h
         src/LogicGate.cpp
         src/LS04.cpp
+        src/LS08.cpp
+        src/LS32.cpp
+        src/LS86.cpp
+        src/LS138.cpp
+        src/LS139.cpp
         src/Oscillator.cpp
         src/UtilityDevice.cpp
 )

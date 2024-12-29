@@ -11,6 +11,10 @@
 
 #include "Graphics.h"
 #include "LS04.h"
+#include "LS08.h"
+#include "LS32.h"
+#include "LS86.h"
+#include "LS138.h"
 #include "LS139.h"
 #include "Oscillator.h"
 
@@ -19,15 +23,12 @@ namespace Simul {
 void main()
 {
 
-    //        SetTraceLogLevel(LOG_FATAL);
     InitWindow(30 * static_cast<int>(PITCH), 30 * static_cast<int>(PITCH), "Simul");
     SetWindowState(FLAG_VSYNC_HINT);
-    //    SetExitKey(KEY_NULL);
     SetTargetFPS(60);
-    //    MaximizeWindow();
 
     Board board;
-    oscillator_test(board);
+    LS86_test(board);
     auto        time = std::chrono::high_resolution_clock::now();
     auto        quit { false };
     std::thread t { [&quit](Board *board) {

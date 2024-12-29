@@ -23,6 +23,7 @@ void Oscillator::simulate(duration ts)
         last_pulse = ts;
     }
 }
+
 void oscillator_test(Board &board)
 {
     board.circuit.name = "Oscillator test";

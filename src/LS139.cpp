@@ -56,8 +56,7 @@ void ls139_test(Board &board)
 {
     board.circuit.name = "LS139 Test";
     auto *ls139 = board.circuit.add_component<LS139>();
-    auto U = board.add_package<DIP<16, Orientation::North>>(Vector2 { 10, 6 });
-    connect(ls139, U);
+    board.add_device<LS139, DIP<16, Orientation::North>>(ls139, Vector2 { 10, 6 });
     for (auto decoder = 0; decoder < 2; ++decoder) {
         std::array<TieDown *, 2> in {};
         for (auto ix = 0; ix < 2; ++ix) {

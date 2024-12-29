@@ -25,7 +25,7 @@ void Inverter::simulate(duration)
 LogicGate::LogicGate(std::string const &name, int inputs, std::string const &ref)
     : Device(name, ref)
 {
-    assert(inputs > 2);
+    assert(inputs > 1);
     A1 = add_pin(1, "A1");
     A2 = add_pin(2, "A2");
     for (auto ix = 2; ix < inputs; ++ix) {
@@ -101,14 +101,14 @@ PinState NorGate::finalize(PinState s)
 XorGate::XorGate(std::string const &ref)
     : Device("XOR", ref)
 {
-    a1 = add_pin(1, "A1");
-    a2 = add_pin(2, "A2");
-    y = add_pin(3, "Y");
+    A1 = add_pin(1, "A1");
+    A2 = add_pin(2, "A2");
+    Y = add_pin(3, "Y");
 }
 
 void XorGate::simulate(duration)
 {
-    y->state = a1->state ^ a2->state;
+    Y->state = A1->state ^ A2->state;
 }
 
 
