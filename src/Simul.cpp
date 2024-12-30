@@ -12,10 +12,11 @@
 #include "Graphics.h"
 #include "LS04.h"
 #include "LS08.h"
-#include "LS32.h"
-#include "LS86.h"
 #include "LS138.h"
 #include "LS139.h"
+#include "LS32.h"
+#include "LS86.h"
+#include "Latch.h"
 #include "Oscillator.h"
 
 namespace Simul {
@@ -28,7 +29,7 @@ void main()
     SetTargetFPS(60);
 
     Board board;
-    LS86_test(board);
+    DFlipFlop_test(board);
     auto        time = std::chrono::high_resolution_clock::now();
     auto        quit { false };
     std::thread t { [&quit](Board *board) {

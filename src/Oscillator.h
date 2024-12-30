@@ -53,6 +53,10 @@ struct OscillatorIcon : Package<1> {
             DrawLineStrip(points, 6, BLACK);
         }
     }
+
+    void handle_input() override
+    {
+    }
 };
 
 void oscillator_test(Board &board);

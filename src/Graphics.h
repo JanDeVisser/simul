@@ -103,7 +103,7 @@ struct DIPSwitch : public Package<S> {
     {
         switch (O) {
         case Orientation::West:
-            AbstractPackage::rect = Rectangle { PITCH * pin1.x - 4, PITCH * (pin1.y - 2) - 4, PITCH * S * 2 + 8, PITCH * 4 + 8 };
+            AbstractPackage::rect = Rectangle { PITCH * pin1.x - 4, PITCH * (pin1.y - 4) - 4, PITCH * S * 2 + 8, PITCH * 4 + 8 };
             position = { PITCH * pin1.x + 2, PITCH * (pin1.y - 4) + 2 };
             incr = Vector2Scale({ 1, 0 }, PITCH);
             switch_on = { 0, 0 };

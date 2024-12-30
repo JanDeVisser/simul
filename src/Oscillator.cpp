@@ -28,8 +28,7 @@ void oscillator_test(Board &board)
 {
     board.circuit.name = "Oscillator test";
     auto *oscillator = board.circuit.add_component<Oscillator>(2);
-    auto *icon = board.add_package<OscillatorIcon>(Vector2 { 1, 1 });
-    connect(oscillator, icon);
+    board.add_device<Oscillator,OscillatorIcon>(oscillator, Vector2 { 1, 1 });
     auto L = board.add_package<LEDArray<1, Orientation::North>>(Vector2 { 6, 2 });
     connect(oscillator->Y, L);
 }

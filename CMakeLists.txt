@@ -16,6 +16,7 @@ add_executable(
         src/Pin.cpp
         src/Device.h
         src/Circuit.h
+        src/Latch.cpp
         src/LogicGate.cpp
         src/LS04.cpp
         src/LS08.cpp
