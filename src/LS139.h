@@ -26,7 +26,7 @@ struct LS139 : public Device {
     LS139();
 };
 
-void ls139_test(Board &);
+void LS139_test(Board &);
 
 template<Orientation O>
 inline void connect(LS139 *device, DIP<16, O> *package)

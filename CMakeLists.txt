@@ -24,6 +24,8 @@ add_executable(
         src/LS86.cpp
         src/LS138.cpp
         src/LS139.cpp
+        src/LS377.cpp
+        src/LS574.cpp
         src/Oscillator.cpp
         src/UtilityDevice.cpp
 )

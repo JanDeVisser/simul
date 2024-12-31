@@ -49,6 +49,15 @@ struct Package : public AbstractPackage {
     }
 };
 
+inline Color pin_color(Pin *pin)
+{
+    switch (pin->state) {
+    case PinState::Z: return DARKGRAY;
+    case PinState::Low: return DARKPURPLE;
+    case PinState::High: return RED;
+    }
+}
+
 template<size_t S, Orientation O = Orientation::West>
 struct LEDArray : public Package<S> {
     Vector2 incr {};
@@ -81,7 +90,7 @@ struct LEDArray : public Package<S> {
         Vector2 p { Package<S>::pin1_tx };
         DrawRectangleRounded(AbstractPackage::rect, 0.5, 2, BLACK);
         for (auto ix = 0; ix < S; ++ix) {
-            Color color = (Package<S>::pins[ix] && Package<S>::pins[ix]->on()) ? RED : DARKPURPLE;
+            auto color = pin_color(Package<S>::pins[ix]);
             DrawRectangleRounded({ p.x + 2, p.y + 2, PITCH * 2.0f - 4, PITCH * 2.0f - 4 }, 1.0, 2, color);
             p = Vector2Add(p, incr);
         }

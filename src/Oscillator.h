@@ -21,42 +21,9 @@ struct Oscillator : public Device {
 };
 
 struct OscillatorIcon : Package<1> {
-    explicit OscillatorIcon(Vector2 pos)
-        : Package<1>(pos)
-    {
-        AbstractPackage::rect = { Package<1>::pin1_tx.x, Package<1>::pin1_tx.y, 4*PITCH, 4*PITCH };
-    }
-
-    void render() override
-    {
-        Vector2 center = Vector2Add(Package<1>::pin1_tx, { 2*PITCH, 2*PITCH });
-        DrawCircleV(center, 2*PITCH, GRAY);
-        if (Package<1>::pins[0]->on()) {
-            Vector2 points[6] {
-                { center.x - 1.5f * PITCH, center.y + PITCH },
-                { center.x - PITCH, center.y + PITCH },
-                { center.x - PITCH, center.y - PITCH },
-                { center.x + PITCH, center.y - PITCH },
-                { center.x + PITCH, center.y + PITCH },
-                { center.x + 1.5f * PITCH, center.y + PITCH },
-            };
-            DrawLineStrip(points, 6, BLACK);
-        } else {
-            Vector2 points[6] {
-                { center.x - 1.5f * PITCH, center.y - PITCH },
-                { center.x - PITCH, center.y - PITCH },
-                { center.x - PITCH, center.y + PITCH },
-                { center.x + PITCH, center.y + PITCH },
-                { center.x + PITCH, center.y - PITCH },
-                { center.x + 1.5f * PITCH, center.y - PITCH },
-            };
-            DrawLineStrip(points, 6, BLACK);
-        }
-    }
-
-    void handle_input() override
-    {
-    }
+    explicit OscillatorIcon(Vector2 pos);
+    void render() override;
+    void handle_input() override;
 };
 
 void oscillator_test(Board &board);

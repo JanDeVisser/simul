@@ -52,7 +52,7 @@ LS139::LS139()
     }
 }
 
-void ls139_test(Board &board)
+void LS139_test(Board &board)
 {
     board.circuit.name = "LS139 Test";
     auto *ls139 = board.circuit.add_component<LS139>();

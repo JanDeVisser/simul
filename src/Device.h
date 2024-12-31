@@ -76,9 +76,9 @@ struct Device {
         return nullptr;
     }
 
-    Pin *add_pin(int nr, std::string const &pin_name)
+    Pin *add_pin(int nr, std::string const &pin_name, PinState state = PinState::Z)
     {
-        pins.push_back(new Pin { nr, pin_name });
+        pins.push_back(new Pin { nr, pin_name, state });
         return pins.back();
     }
 

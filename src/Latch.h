@@ -28,6 +28,20 @@ struct DFlipFlop : public Device {
     DFlipFlop();
 };
 
+struct DFlipFlopIcon : Package<3> {
+    explicit DFlipFlopIcon(Vector2 pos);
+    void render() override;
+    void handle_input() override;
+};
+
+template<>
+inline void connect(DFlipFlop *device, DFlipFlopIcon *package)
+{
+    package->pins[0] = device->D;
+    package->pins[1] = device->CLK;
+    package->pins[2] = device->Q;
+}
+
 void SRLatch_test(Board&);
 void DFlipFlop_test(Board&);
 

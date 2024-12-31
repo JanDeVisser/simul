@@ -26,8 +26,8 @@ PinState      operator^(PinState const &s1, PinState const &s2);
 struct Pin {
     int         pin_nr;
     std::string name;
+    PinState    state { PinState::Z };
     Pin        *feed { nullptr };
-    PinState    state { PinState::Low };
 
     [[nodiscard]] bool on() const;
     [[nodiscard]] bool off() const;

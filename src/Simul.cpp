@@ -16,6 +16,8 @@
 #include "LS139.h"
 #include "LS32.h"
 #include "LS86.h"
+#include "LS377.h"
+#include "LS574.h"
 #include "Latch.h"
 #include "Oscillator.h"
 
@@ -29,7 +31,7 @@ void main()
     SetTargetFPS(60);
 
     Board board;
-    DFlipFlop_test(board);
+    LS574_test(board);
     auto        time = std::chrono::high_resolution_clock::now();
     auto        quit { false };
     std::thread t { [&quit](Board *board) {

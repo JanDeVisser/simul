@@ -60,18 +60,43 @@ void SRLatch_test(Board &board)
     connect(std::array<Pin*,2> { latch->Q, latch->_Q }, L);
 }
 
+DFlipFlopIcon::DFlipFlopIcon(Vector2 pos)
+    : Package<3>(pos)
+{
+    AbstractPackage::rect = { pin1_tx.x, pin1_tx.y, 6*PITCH, 6*PITCH };
+}
+
+void DFlipFlopIcon::render()
+{
+    auto p = pin1_tx;
+    DrawRectangleLines(p.x + PITCH, p.y + PITCH, 4*PITCH, 4*PITCH, BLACK);
+    DrawTriangleLines(
+        { p.x + PITCH, p.y + 3.4f * PITCH },
+        { p.x + PITCH, p.y + 4.6f * PITCH },
+        { p.x + 2 * PITCH, p.y + 4 * PITCH },
+        BLACK);
+    DrawCircleV({p.x + PITCH, p.y + 2*PITCH }, 0.4f*PITCH, pin_color(pins[0]));
+    DrawCircleV({p.x + PITCH, p.y + 4*PITCH }, 0.4f*PITCH, pin_color(pins[1]));
+    DrawCircleV({p.x + 5*PITCH, p.y + 3*PITCH }, 0.4f*PITCH, pin_color(pins[2]));
+}
+
+void DFlipFlopIcon::handle_input()
+{
+}
+
 void DFlipFlop_test(Board &board)
 {
     board.circuit.name = "D-Flip Flop Test";
     auto *latch = board.circuit.add_component<DFlipFlop>();
+    board.add_device<DFlipFlop,DFlipFlopIcon>(latch, Vector2 { 8, 1 });
     auto *clock = board.circuit.add_component<Oscillator>(1);
-    board.add_device<Oscillator,OscillatorIcon>(clock, Vector2 { 1, 1 });
+    board.add_device<Oscillator,OscillatorIcon>(clock, Vector2 { 1, 5 });
     auto *D = board.circuit.add_component<TieDown>(PinState::Low);
     latch->D->feed = D->Y;
     latch->CLK->feed = clock->Y;
-    auto S = board.add_package<DIPSwitch<1, Orientation::West>>(Vector2 { 7, 5 });
+    auto S = board.add_package<DIPSwitch<1, Orientation::North>>(Vector2 { 1, 1 });
     connect(D->Y, S);
-    auto L = board.add_package<LEDArray<1, Orientation::North>>(Vector2 { 11, 2 });
+    auto L = board.add_package<LEDArray<1, Orientation::North>>(Vector2 { 16, 3 });
     connect(latch->Q, L);
 }
 
