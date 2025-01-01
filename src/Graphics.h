@@ -19,10 +19,10 @@
 namespace Simul {
 
 enum class Orientation {
-    North,
-    West,
-    South,
-    East,
+    North = -90,
+    West = 0,
+    South = 90,
+    East = 180,
 };
 
 static constexpr float PITCH = (4 * 2.54f);
@@ -52,9 +52,12 @@ struct Package : public AbstractPackage {
 inline Color pin_color(Pin *pin)
 {
     switch (pin->state) {
-    case PinState::Z: return DARKGRAY;
-    case PinState::Low: return DARKPURPLE;
-    case PinState::High: return RED;
+    case PinState::Z:
+        return DARKGRAY;
+    case PinState::Low:
+        return DARKPURPLE;
+    case PinState::High:
+        return RED;
     }
 }
 
@@ -176,6 +179,99 @@ struct DIPSwitch : public Package<S> {
     }
 };
 
+template<int S, Orientation O = Orientation::West>
+struct TriStateSwitch : public Package<S> {
+    std::array<Pin *, S> pins {};
+    Vector2              position {};
+    Vector2              incr {};
+    Vector2              switch_on {};
+    Vector2              switch_z {};
+    Vector2              switch_off {};
+    Vector2              size { 2 * PITCH - 4, 2 * PITCH - 4 };
+    Vector2              full_size { 2 * PITCH - 2, 6 * PITCH - 2 };
+
+    explicit TriStateSwitch(Vector2 pin1)
+        : Package<S>(pin1)
+    {
+        switch (O) {
+        case Orientation::West:
+            AbstractPackage::rect = Rectangle { PITCH * pin1.x - 4, PITCH * (pin1.y - 4) - 4, PITCH * S * 2 + 8, PITCH * 6 + 8 };
+            position = { PITCH * pin1.x + 2, PITCH * (pin1.y - 6) + 2 };
+            incr = Vector2Scale({ 1, 0 }, PITCH);
+            switch_on = { 0, 0 };
+            switch_z = { 0, 2 * PITCH };
+            switch_off = { 0, 4 * PITCH };
+            break;
+        case Orientation::East:
+            AbstractPackage::rect = Rectangle { PITCH * (pin1.x - S) - 4, PITCH * pin1.y - 4, PITCH * S * 2 + 8, PITCH * 6 + 8 };
+            position = { PITCH * (pin1.x - 2 * S) + 2, pin1.y + 2 };
+            incr = { -2 * PITCH, 0 };
+            switch_on = { 0, 4 * PITCH };
+            switch_z = { 0, 2 * PITCH };
+            switch_off = { 0, 0 };
+            break;
+        case Orientation::North:
+            AbstractPackage::rect = Rectangle { PITCH * pin1.x - 4, PITCH * pin1.y - 4, PITCH * 6 + 8, PITCH * S * 2 + 8 };
+            position = { PITCH * pin1.x + 2, PITCH * pin1.y + 2 };
+            incr = { 0, 2 * PITCH };
+            switch_on = { 4 * PITCH, 0 };
+            switch_z = { 2 * PITCH, 0 };
+            switch_off = { 0, 0 };
+            full_size = { 6 * PITCH - 2, 2 * PITCH - 2 };
+            break;
+        case Orientation::South:
+            AbstractPackage::rect = Rectangle { PITCH * (pin1.x - 2) - 4, PITCH * (pin1.y - S) - 4, PITCH * 6 + 8, PITCH * S * 2 + 8 };
+            position = { PITCH * (pin1.x - 6) + 2, PITCH * (pin1.y - 2 * S) + 2 };
+            incr = { 0, -2 * PITCH };
+            switch_on = { 0, 0 };
+            switch_z = { 2 * PITCH, 0 };
+            switch_off = { 4 * PITCH, 0 };
+            full_size = { 6 * PITCH - 2, 2 * PITCH - 2 };
+            break;
+        }
+    }
+
+    void handle_input() override
+    {
+        if (!IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+            return;
+        }
+        Vector2 p = position;
+        for (auto ix = 0; ix < S; ++ix) {
+            Rectangle r { p.x - 1, p.y - 1, full_size.x, full_size.y };
+            if (CheckCollisionPointRec(GetMousePosition(), r)) {
+                switch (pins[ix]->state) {
+                case PinState::Low: pins[ix]->state = PinState::Z; break;
+                case PinState::Z: pins[ix]->state = PinState::High; break;
+                case PinState::High: pins[ix]->state = PinState::Low; break;
+                }
+            }
+            p = Vector2Add(p, incr);
+        }
+    }
+
+    void render() override
+    {
+        DrawRectangleRounded(AbstractPackage::rect, 0.3, 10, BLACK);
+        Vector2 p = position;
+        for (auto ix = 0; ix < S; ++ix) {
+            Color color = pin_color(pins[ix]);
+            Vector2 offset;
+            switch (pins[ix]->state) {
+            case PinState::Low: offset = switch_off; break;
+            case PinState::Z: offset = switch_z; break;
+            case PinState::High: offset = switch_on; break;
+            }
+            DrawRectangleV(Vector2Add(p, offset), size, color);
+            Rectangle r { p.x - 1, p.y - 1, full_size.x, full_size.y };
+            if (CheckCollisionPointRec(GetMousePosition(), r)) {
+                DrawRectangleRoundedLines(r, 0.3, 10, 1, GOLD);
+            }
+            p = Vector2Add(p, incr);
+        }
+    }
+};
+
 template<size_t S, Orientation O = Orientation::West>
 struct DIP : public Package<S> {
     std::array<Pin *, S> pins {};
@@ -263,15 +359,32 @@ inline void connect(Pin *device, P *package)
 }
 
 struct Board {
+    struct Text {
+        Vector2     pos;
+        std::string text;
+        float       rotation { 0.0 };
+    };
+
+    Font                                          font;
     Vector2                                       size {};
     std::vector<std::unique_ptr<AbstractPackage>> packages {};
     Circuit                                       circuit {};
+    std::vector<Text>                             texts;
 
-    Board() = default;
+    Board()
+        : font(GetFontDefault())
+    {
+    }
+
+    explicit Board(Font font)
+        : font(font)
+    {
+    }
 
     explicit Board(std::string const &name)
-        : circuit(name)
+        : Board()
     {
+        circuit = std::move(Circuit { name });
     }
 
     void render()
@@ -279,6 +392,10 @@ struct Board {
         ClearBackground(DARKGREEN);
         for (auto const &p : packages) {
             p->render();
+        }
+        for (auto const &text : texts) {
+            auto p = Vector2Scale(text.pos, PITCH);
+            DrawTextPro(font, text.text.data(), p, p, text.rotation, 20, 2, BLACK);
         }
     }
 
@@ -290,6 +407,11 @@ struct Board {
                 break;
             }
         }
+    }
+
+    void add_text(Vector2 pos, std::string text)
+    {
+        texts.emplace_back(pos, std::move(text));
     }
 
     template<class P, typename... Args>

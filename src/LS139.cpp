@@ -66,9 +66,9 @@ void LS139_test(Board &board)
         ls139->A[decoder]->feed = in[0]->Y;
         ls139->B[decoder]->feed = in[1]->Y;
 
-        auto S = board.add_package<DIPSwitch<2, Orientation::North>>(Vector2 { 2.0f + static_cast<float>(decoder)*14.0f, 3 });
+        auto S = board.add_package<DIPSwitch<2, Orientation::North>>(Vector2 { 3 + decoder*14.0f, 3 });
         connect(in, S);
-        auto L = board.add_package<LEDArray<4, Orientation::North>>(Vector2 { 3.0f + static_cast<float>(decoder)*14.0f, 10 });
+        auto L = board.add_package<LEDArray<4, Orientation::North>>(Vector2 { 4 + decoder*14.0f, 10 });
         connect(std::array<Pin *, 4> { ls139->Y0[decoder], ls139->Y1[decoder], ls139->Y2[decoder], ls139->Y3[decoder] }, L);
     }
 }

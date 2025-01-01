@@ -115,6 +115,15 @@ struct XorIcon : LogicIcon {
     [[nodiscard]] char const * label() const override { return "=1"; }
 };
 
+struct TristatePin : public Device {
+    Pin *I;
+    Pin *O;
+    Pin *DIR;
+
+    explicit TristatePin(std::string const &ref = "");
+    void simulate(duration) override;
+};
+
 struct TriStateBuffer : public Device {
     Pin *A;
     Pin *E;
