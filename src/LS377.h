@@ -10,25 +10,45 @@
 
 #include "Device.h"
 #include "Graphics.h"
+#include "Latch.h"
+#include "LogicGate.h"
 #include "Pin.h"
 
 namespace Simul {
 
 struct LS377 : public Device {
-    Pin * E {};
-    Pin * CLK {};
-    std::array<Pin *, 8> D {};
-    std::array<Pin *, 8> Q {};
+    struct Latch : public Device {
+        Pin *D;
+        Pin *Q;
+        Pin *E;
+        Pin *E_;
+        Pin *CLK;
+
+        AndGate   *Dand;
+        AndGate   *feedback;
+        OrGate    *combine;
+        DFlipFlop *flipflop;
+
+        Latch();
+    };
+
+    Pin                   *E_ {};
+    Inverter              *Einv;
+    Pin                   *CLK {};
+    std::array<Pin *, 8>   D {};
+    std::array<Latch *, 8> latches {};
+    std::array<Pin *, 8>   Q {};
 
     LS377();
 };
 
 void LS377_test(Board &);
+void LS377_latch_test(Board &);
 
 template<Orientation O>
 inline void connect(LS377 *device, DIP<20, O> *package)
 {
-    package->pins[0] = device->E;
+    package->pins[0] = device->E_;
     package->pins[1] = device->Q[0];
     package->pins[2] = device->D[0];
     package->pins[3] = device->D[1];
