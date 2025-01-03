@@ -16,6 +16,7 @@ add_executable(
         src/Pin.cpp
         src/Device.h
         src/Circuit.h
+        src/GP_Register.cpp
         src/Latch.cpp
         src/LogicGate.cpp
         src/LS04.cpp
@@ -29,6 +30,8 @@ add_executable(
         src/LS574.cpp
         src/Oscillator.cpp
         src/UtilityDevice.cpp
+        src/GP_Register.cpp
+        src/GP_Register.h
 )
 
 target_include_directories(simul PRIVATE ${raylib_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})

@@ -119,6 +119,7 @@ struct TristatePin : public Device {
     Pin *I;
     Pin *O;
     Pin *DIR;
+    Pin *OE_;
 
     explicit TristatePin(std::string const &ref = "");
     void simulate(duration) override;

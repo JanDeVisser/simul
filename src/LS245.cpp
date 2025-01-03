@@ -50,6 +50,8 @@ LS245::LS245()
         channels[bit]->AE->feed = ASide->Y;
         channels[bit]->BE->feed = BSide->Y;
         channels[bit]->DIR->feed = DIR;
+        channels[bit]->A->OE_->feed = OE_;
+        channels[bit]->B->OE_->feed = OE_;
         A[bit] = channels[bit]->A->O;
         B[bit] = channels[bit]->B->O;
     }
@@ -144,8 +146,11 @@ void LS245_test(Board &board)
     inputs[0] = DIR->Y;
     auto *OE_ = board.circuit.add_component<TieDown>(PinState::High);
     inputs[1] = OE_->Y;
-    auto *S = board.add_package<DIPSwitch<2, Orientation::North>>(Vector2 { 10, 1 });
+    auto *S = board.add_package<DIPSwitch<2, Orientation::North>>(Vector2 { 6, 1 });
     connect(inputs, S);
+    board.add_text({1,1}, "DIR");
+    board.add_text({13, 1}, "H: A->B, L: B->A");
+    board.add_text({1, 3}, "OE_");
 
     ls245->DIR->feed = DIR->Y;
     ls245->OE_->feed = OE_->Y;
@@ -165,11 +170,13 @@ void LS245_test(Board &board)
             tiedown->Y->feed = ls245->B[bit];
             ls245->B[bit]->feed = tiedown->Y;
         }
-        board.add_device<LS245::Channel, ChannelView>(ls245->channels[bit], Vector2 { 16, 1.0f + bit * 8 });
+        board.add_device<LS245::Channel, ChannelView>(ls245->channels[bit], Vector2 { 13, 9.0f + bit * 8 });
     }
     auto *A_sw = board.add_package<TriStateSwitch<8, Orientation::North>>(Vector2 { 1, 9 });
     connect(a_switches, A_sw);
+    board.add_text({1, 6}, "A0-A7");
     auto *B_sw = board.add_package<TriStateSwitch<8, Orientation::North>>(Vector2 { 23, 9 });
+    board.add_text({23, 6}, "B0-B7");
     connect(b_switches, B_sw);
 }
 

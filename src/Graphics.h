@@ -28,6 +28,9 @@ enum class Orientation {
 static constexpr float PITCH = (4 * 2.54f);
 
 struct AbstractPackage {
+    Device       *device {};
+    struct Board *board {};
+
     Rectangle rect {};
     virtual ~AbstractPackage() = default;
     virtual void render() = 0;
@@ -238,12 +241,22 @@ struct TriStateSwitch : public Package<S> {
         }
         Vector2 p = position;
         for (auto ix = 0; ix < S; ++ix) {
-            Rectangle r { p.x - 1, p.y - 1, full_size.x, full_size.y };
-            if (CheckCollisionPointRec(GetMousePosition(), r)) {
-                switch (pins[ix]->state) {
-                case PinState::Low: pins[ix]->state = PinState::Z; break;
-                case PinState::Z: pins[ix]->state = PinState::High; break;
-                case PinState::High: pins[ix]->state = PinState::Low; break;
+            {
+                Rectangle r { p.x - 1 + switch_on.x, p.y - 1 + switch_on.y, size.x, size.y };
+                if (CheckCollisionPointRec(GetMousePosition(), r)) {
+                    pins[ix]->state = PinState::High;
+                }
+            }
+            {
+                Rectangle r { p.x - 1 + switch_off.x, p.y - 1 + switch_off.y, size.x, size.y };
+                if (CheckCollisionPointRec(GetMousePosition(), r)) {
+                    pins[ix]->state = PinState::Low;
+                }
+            }
+            {
+                Rectangle r { p.x - 1 + switch_z.x, p.y - 1 + switch_z.y, size.x, size.y };
+                if (CheckCollisionPointRec(GetMousePosition(), r)) {
+                    pins[ix]->state = PinState::Z;
                 }
             }
             p = Vector2Add(p, incr);
@@ -255,12 +268,18 @@ struct TriStateSwitch : public Package<S> {
         DrawRectangleRounded(AbstractPackage::rect, 0.3, 10, BLACK);
         Vector2 p = position;
         for (auto ix = 0; ix < S; ++ix) {
-            Color color = pin_color(pins[ix]);
+            Color   color = pin_color(pins[ix]);
             Vector2 offset;
             switch (pins[ix]->state) {
-            case PinState::Low: offset = switch_off; break;
-            case PinState::Z: offset = switch_z; break;
-            case PinState::High: offset = switch_on; break;
+            case PinState::Low:
+                offset = switch_off;
+                break;
+            case PinState::Z:
+                offset = switch_z;
+                break;
+            case PinState::High:
+                offset = switch_on;
+                break;
             }
             DrawRectangleV(Vector2Add(p, offset), size, color);
             Rectangle r { p.x - 1, p.y - 1, full_size.x, full_size.y };
@@ -362,7 +381,7 @@ struct Board {
     struct Text {
         Vector2     pos;
         std::string text;
-        float       rotation { 0.0 };
+        float       angle { 0.0 };
     };
 
     Font                                          font;
@@ -395,7 +414,7 @@ struct Board {
         }
         for (auto const &text : texts) {
             auto p = Vector2Scale(text.pos, PITCH);
-            DrawTextPro(font, text.text.data(), p, p, text.rotation, 20, 2, BLACK);
+            DrawTextPro(font, text.text.data(), p, { 0, 0 }, text.angle, 20, 2, BLACK);
         }
     }
 
@@ -409,9 +428,9 @@ struct Board {
         }
     }
 
-    void add_text(Vector2 pos, std::string text)
+    void add_text(Vector2 pos, std::string text, float angle = 0.0f)
     {
-        texts.emplace_back(pos, std::move(text));
+        texts.emplace_back(pos, std::move(text), angle);
     }
 
     template<class P, typename... Args>
@@ -421,18 +440,31 @@ struct Board {
         size.x = std::max(size.x, ptr->rect.x + ptr->rect.width + PITCH);
         size.y = std::max(size.y, ptr->rect.y + ptr->rect.height + PITCH);
         packages.emplace_back(dynamic_cast<AbstractPackage *>(ptr));
+        ptr->board = this;
         return ptr;
     }
 
     template<class D, class P, typename... Args>
     P *add_device(D *device, Args &&...args)
     {
-        auto *ptr = new P(args...);
-        size.x = std::max(size.x, ptr->rect.x + ptr->rect.width + PITCH);
-        size.y = std::max(size.y, ptr->rect.y + ptr->rect.height + PITCH);
-        packages.emplace_back(dynamic_cast<AbstractPackage *>(ptr));
+        auto *ptr = add_package<P>(args...);
+        ptr->device = device;
         connect(device, ptr);
         return ptr;
+    }
+
+    template<class D, class P, typename... Args>
+    D *add_device(int px, int py, std::string const &name = "", std::string const &ref = "", Args &&...args)
+    {
+        auto *device = circuit.add_component<D>(args...);
+        auto *pkg = add_device<D, P>(device, Vector2 { static_cast<float>(px), static_cast<float>(py) });
+        if (!ref.empty()) {
+            add_text(Vector2Add(pkg->pin1, { 4, -2 }), ref);
+        }
+        if (!name.empty()) {
+            add_text(Vector2Add(pkg->pin1, { 2, 0 }), name, 90);
+        }
+        return device;
     }
 };
 

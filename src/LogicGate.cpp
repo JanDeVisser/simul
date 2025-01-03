@@ -177,15 +177,16 @@ TristatePin::TristatePin(std::string const &ref)
 {
     I = add_pin(1, "I", PinState::Z);
     O = add_pin(2, "O", PinState::Z);
-    DIR = add_pin(2, "DIR", PinState::High);
+    DIR = add_pin(3, "DIR", PinState::High);
+    OE_ = add_pin(4, "OE_", PinState::High);
 }
 
 void TristatePin::simulate(duration)
 {
     if (DIR->state == PinState::High) {
-        I->state = O->state;
+        I->state = (OE_->off()) ? O->state : PinState::Z;
     } else {
-        O->state = I->state;
+        O->state = (OE_->off()) ? I->state : PinState::Z;
     }
 }
 

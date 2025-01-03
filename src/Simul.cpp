@@ -10,19 +10,9 @@
 #include <raylib.h>
 
 #include "Graphics.h"
-#include "LS04.h"
-#include "LS08.h"
-#include "LS138.h"
-#include "LS139.h"
+#include "GP_Register.h"
 #include "LS245.h"
-#include "LS32.h"
 #include "LS377.h"
-#include "LS574.h"
-#include "LS86.h"
-#include "Latch.h"
-#include "Oscillator.h"
-
-#define TEST_NAME LS245_channel
 
 namespace Simul {
 
@@ -36,7 +26,8 @@ void main()
         {
 
             Board board { font };
-            LS245_test(board);
+            EightBit_GP_Register(board);
+//            LS245_test(board);
             auto        time = std::chrono::high_resolution_clock::now();
             auto        quit { false };
             std::thread t { [&quit](Board *board) {

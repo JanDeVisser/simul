@@ -60,7 +60,7 @@ struct Device {
     void propagate()
     {
         for (auto *pin : pins) {
-            if (pin->feed) {
+            if (pin->feed && pin->feed->state != PinState::Z) {
                 pin->state = pin->feed->state;
             }
         }
