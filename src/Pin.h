@@ -28,6 +28,7 @@ struct Pin {
     std::string name;
     PinState    state { PinState::Z };
     Pin        *feed { nullptr };
+    Pin        *drive { nullptr };
 
     [[nodiscard]] bool on() const;
     [[nodiscard]] bool off() const;

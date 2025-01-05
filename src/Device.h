@@ -22,6 +22,7 @@ struct Device {
     std::string           ref;
     std::vector<Pin *>    pins;
     std::vector<Device *> components;
+    Device               *parent { nullptr };
 
     explicit Device(std::string name, std::string ref)
         : name(std::move(name))
@@ -63,6 +64,9 @@ struct Device {
             if (pin->feed && pin->feed->state != PinState::Z) {
                 pin->state = pin->feed->state;
             }
+            if (pin->drive && pin->state != PinState::Z) {
+                pin->drive->state = pin->state;
+            }
         }
     }
 
@@ -83,9 +87,12 @@ struct Device {
     }
 
     template<class D, typename... Args>
+        requires std::derived_from<D, Device>
     D *add_component(Args &&...args)
     {
-        components.push_back(new D { args... });
+        auto *device = dynamic_cast<Device *>(new D { args... });
+        device->parent = this;
+        components.push_back(device);
         return dynamic_cast<D *>(components.back());
     }
 };

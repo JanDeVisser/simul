@@ -13,6 +13,7 @@
 #include "GP_Register.h"
 #include "LS245.h"
 #include "LS377.h"
+#include "System.h"
 
 namespace Simul {
 
@@ -25,27 +26,26 @@ void main()
         auto font = LoadFontEx("fonts/Tecnico-Bold.ttf", 20, nullptr, 0);
         {
 
-            Board board { font };
-            EightBit_GP_Register(board);
+            Circuit circuit;
+            System system(font) ;
 //            LS245_test(board);
             auto        time = std::chrono::high_resolution_clock::now();
             auto        quit { false };
-            std::thread t { [&quit](Board *board) {
+            std::thread t { [&]() {
                                auto start = std::chrono::high_resolution_clock::now();
                                auto current = start;
                                do {
-                                   board->circuit.simulate_step(current - start);
+                                   system.circuit.simulate_step(current - start);
                                    std::this_thread::sleep_for(1ms);
                                    current = std::chrono::high_resolution_clock::now();
                                } while (!quit);
-                           },
-                &board };
+                           } };
 
-            SetWindowSize(static_cast<int>(board.size.x), static_cast<int>(board.size.y));
+            SetWindowSize(static_cast<int>(system.size.x), static_cast<int>(system.size.y));
             while (!WindowShouldClose()) {
-                board.handle_input();
+                system.handle_input();
                 BeginDrawing();
-                board.render();
+                system.render();
                 EndDrawing();
             }
             quit = true;

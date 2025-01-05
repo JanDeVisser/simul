@@ -56,7 +56,7 @@ struct LatchView : public Package<5> {
 
     void render() override
     {
-        auto p = pin1_tx;
+        auto p { pin1_tx };
         DrawRectangleLines(p.x + PITCH, p.y + PITCH, 4*PITCH, 4*PITCH, BLACK);
         DrawTriangleLines(
             { p.x + PITCH, p.y + 3.4f * PITCH },
@@ -90,17 +90,17 @@ void LS574_latch_test(Board &board)
     inputs[1] = CLK->Y;
     auto *D = board.circuit.add_component<TieDown>(PinState::Low);
     inputs[2] = D->Y;
-    auto *S = board.add_package<DIPSwitch<3, Orientation::North>>(Vector2 { 1, 3 });
+    auto *S = board.add_package<DIPSwitch<3, Orientation::North>>(1, 3);
     connect(inputs, S);
 
     auto *latch = board.circuit.add_component<LS574::Latch>();
     latch->OE->feed = OE->Y;
     latch->CLK->feed = CLK->Y;
     latch->D->feed = D->Y;
-    board.add_device<DFlipFlop, DFlipFlopIcon>(latch->flipflop, Vector2 {7, 6});
-    board.add_device<TriStateBuffer, TriStateIcon>(latch->output, Vector2 {15, 6});
+    board.add_device<DFlipFlop, DFlipFlopIcon>(latch->flipflop, 7, 6);
+    board.add_device<TriStateBuffer, TriStateIcon>(latch->output, 15, 6);
 
-    auto *L = board.add_package<LEDArray<1, Orientation::North>>(Vector2 { 20, 6 });
+    auto *L = board.add_package<LEDArray<1, Orientation::North>>(20, 6);
     connect(latch->Q, L);
 }
 
@@ -108,14 +108,14 @@ void LS574_test(Board &board)
 {
     board.circuit.name = "LS574 Test";
     auto *ls574 = board.circuit.add_component<LS574>();
-    board.add_device<LS574, DIP<20, Orientation::North>>(ls574, Vector2 { 10, 6 });
+    board.add_device<LS574, DIP<20, Orientation::North>>(ls574, 10, 6);
 
     auto  controls = std::array<Pin *, 2> {};
     auto *OE = board.circuit.add_component<TieDown>(PinState::Low);
     controls[0] = OE->Y;
     auto *CLK = board.circuit.add_component<TieDown>(PinState::Low);
     controls[1] = CLK->Y;
-    auto *S = board.add_package<DIPSwitch<2, Orientation::North>>(Vector2 { 1, 3 });
+    auto *S = board.add_package<DIPSwitch<2, Orientation::North>>(1, 3);
     connect(controls, S);
 
     auto *oe_inv = board.circuit.add_component<Inverter>();
@@ -133,11 +133,11 @@ void LS574_test(Board &board)
         d_switches[bit] = tiedown->Y;
         ls574->D[bit]->feed = tiedown->Y;
         d_pins[bit] = tiedown->Y;
-        board.add_device<LS574::Latch, LatchView>(ls574->latches[bit], Vector2 { 16, 1.0f + bit*8 });
+        board.add_device<LS574::Latch, LatchView>(ls574->latches[bit], 16, 1 + bit*8);
     }
-    auto *data_S = board.add_package<DIPSwitch<8, Orientation::North>>(Vector2 { 1, 9 });
+    auto *data_S = board.add_package<DIPSwitch<8, Orientation::North>>(1, 9);
     connect(d_pins, data_S);
-    auto *L = board.add_package<LEDArray<8, Orientation::North>>(Vector2 { 23, 3 });
+    auto *L = board.add_package<LEDArray<8, Orientation::North>>(23, 3);
     connect(ls574->Q, L);
 }
 

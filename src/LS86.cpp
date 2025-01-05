@@ -23,8 +23,7 @@ LS86::LS86()
 void LS86_test(Board &board)
 {
     board.circuit.name = "LS86 Test";
-    auto *ls86 = board.circuit.add_component<LS86>();
-    board.add_device<LS86, DIP<14, Orientation::North>>(ls86, Vector2 { 10, 6 });
+    auto *ls86 = board.add_device<LS86, DIP<14, Orientation::North>>(10, 6);
     std::array<TieDown *, 8> in {};
     std::array<Pin*,4> outputs {};
     for (auto gate = 0; gate < 4; ++gate) {
@@ -34,9 +33,9 @@ void LS86_test(Board &board)
         ls86->B[gate]->feed = in[2*gate+1]->Y;
         outputs[gate] = ls86->Y[gate];
     }
-    auto S = board.add_package<DIPSwitch<8, Orientation::North>>(Vector2 { 2, 3 });
+    auto S = board.add_package<DIPSwitch<8, Orientation::North>>(2, 3);
     connect(in, S);
-    auto L = board.add_package<LEDArray<4, Orientation::North>>(Vector2 { 17, 6 });
+    auto L = board.add_package<LEDArray<4, Orientation::North>>(17, 6);
     connect(outputs, L);
 }
 

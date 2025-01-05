@@ -54,9 +54,9 @@ void SRLatch_test(Board &board)
     }
     latch->_S->feed = in[0]->Y;
     latch->_R->feed = in[1]->Y;
-    auto S = board.add_package<DIPSwitch<2, Orientation::North>>(Vector2 { 2, 3 });
+    auto S = board.add_package<DIPSwitch<2, Orientation::North>>(2, 3);
     connect(in, S);
-    auto L = board.add_package<LEDArray<2, Orientation::North>>(Vector2 { 8, 3 });
+    auto L = board.add_package<LEDArray<2, Orientation::North>>(8, 3);
     connect(std::array<Pin*,2> { latch->Q, latch->_Q }, L);
 }
 
@@ -87,16 +87,15 @@ void DFlipFlopIcon::handle_input()
 void DFlipFlop_test(Board &board)
 {
     board.circuit.name = "D-Flip Flop Test";
-    auto *latch = board.circuit.add_component<DFlipFlop>();
-    board.add_device<DFlipFlop,DFlipFlopIcon>(latch, Vector2 { 8, 1 });
+    auto *latch = board.add_device<DFlipFlop,DFlipFlopIcon>(8, 1);
     auto *clock = board.circuit.add_component<Oscillator>(1);
-    board.add_device<Oscillator,OscillatorIcon>(clock, Vector2 { 1, 5 });
+    board.add_device<Oscillator,OscillatorIcon>(clock, 1, 5);
     auto *D = board.circuit.add_component<TieDown>(PinState::Low);
     latch->D->feed = D->Y;
     latch->CLK->feed = clock->Y;
-    auto S = board.add_package<DIPSwitch<1, Orientation::North>>(Vector2 { 1, 1 });
+    auto S = board.add_package<DIPSwitch<1, Orientation::North>>(1, 1);
     connect(D->Y, S);
-    auto L = board.add_package<LEDArray<1, Orientation::North>>(Vector2 { 16, 3 });
+    auto L = board.add_package<LEDArray<1, Orientation::North>>(16, 3);
     connect(latch->Q, L);
 }
 

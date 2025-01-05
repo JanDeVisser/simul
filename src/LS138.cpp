@@ -91,30 +91,30 @@ void ls138_test(Board &board)
 {
     board.circuit.name = "LS138 Test";
     auto *ls138 = board.circuit.add_component<LS138>();
-    board.add_device<LS138, DIP<16, Orientation::North>>(ls138, Vector2 { 18, 6 });
+    board.add_device<LS138, DIP<16, Orientation::North>>(ls138, 18, 6);
     std::array<TieDown *, 6> in {};
     for (auto ix = 0; ix < 6; ++ix) {
         in[ix] = board.circuit.add_component<TieDown>(PinState::Low);
     }
     ls138->G1->feed = in[0]->Y;
-    board.add_text({4, 3}, "G1");
+    board.add_text(4, 3, "G1");
     ls138->G2A->feed = in[1]->Y;
-    board.add_text({4, 5}, "G2A_");
+    board.add_text(4, 5, "G2A_");
     ls138->G2B->feed = in[2]->Y;
-    board.add_text({4, 7}, "G2B_");
+    board.add_text(4, 7, "G2B_");
     ls138->A->feed = in[3]->Y;
-    board.add_text({4, 9}, "A0");
+    board.add_text(4, 9, "A0");
     ls138->B->feed = in[4]->Y;
-    board.add_text({4, 11}, "A1");
+    board.add_text(4, 11, "A1");
     ls138->C->feed = in[5]->Y;
-    board.add_text({4, 13}, "A2");
+    board.add_text(4, 13, "A2");
 
-    auto S = board.add_package<DIPSwitch<6, Orientation::North>>(Vector2 { 10, 3 });
+    auto S = board.add_package<DIPSwitch<6, Orientation::North>>(10, 3);
     connect(in, S);
-    auto L = board.add_package<LEDArray<8, Orientation::North>>(Vector2 { 28, 1 });
+    auto L = board.add_package<LEDArray<8, Orientation::North>>(28, 1);
     connect(ls138->Y, L);
     for (auto bit = 0; bit < 8; ++bit) {
-        board.add_text({25, 1 + 2.0f*bit}, std::format("Y{}", bit));
+        board.add_text(25, 1 + 2 * bit, std::format("Y{}", bit));
     }
 }
 

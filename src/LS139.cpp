@@ -55,8 +55,7 @@ LS139::LS139()
 void LS139_test(Board &board)
 {
     board.circuit.name = "LS139 Test";
-    auto *ls139 = board.circuit.add_component<LS139>();
-    board.add_device<LS139, DIP<16, Orientation::North>>(ls139, Vector2 { 10, 6 });
+    auto *ls139 = board.add_device<LS139, DIP<16, Orientation::North>>(10, 6);
     for (auto decoder = 0; decoder < 2; ++decoder) {
         std::array<TieDown *, 2> in {};
         for (auto ix = 0; ix < 2; ++ix) {
@@ -66,9 +65,9 @@ void LS139_test(Board &board)
         ls139->A[decoder]->feed = in[0]->Y;
         ls139->B[decoder]->feed = in[1]->Y;
 
-        auto S = board.add_package<DIPSwitch<2, Orientation::North>>(Vector2 { 3 + decoder*14.0f, 3 });
+        auto S = board.add_package<DIPSwitch<2, Orientation::North>>(3 + decoder*14, 3);
         connect(in, S);
-        auto L = board.add_package<LEDArray<4, Orientation::North>>(Vector2 { 4 + decoder*14.0f, 10 });
+        auto L = board.add_package<LEDArray<4, Orientation::North>>(4 + decoder*14, 10);
         connect(std::array<Pin *, 4> { ls139->Y0[decoder], ls139->Y1[decoder], ls139->Y2[decoder], ls139->Y3[decoder] }, L);
     }
 }

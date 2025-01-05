@@ -232,7 +232,7 @@ void LogicGate_test(Board &board)
     std::array<Pin *, 5> outputs {};
 
     auto *inverter = board.circuit.add_component<Inverter>();
-    board.add_device<Inverter, InverterIcon>(inverter, Vector2 { 10, 2 });
+    board.add_device<Inverter, InverterIcon>(inverter, 10, 2);
     std::array<TieDown *, 2> in {};
     in[0] = board.circuit.add_component<TieDown>(PinState::Low);
     in[1] = board.circuit.add_component<TieDown>(PinState::Low);
@@ -241,35 +241,35 @@ void LogicGate_test(Board &board)
 
     {
         auto *and_gate = board.circuit.add_component<AndGate>();
-        board.add_device<AndGate, AndIcon>(and_gate, Vector2 { 10, 6 });
+        board.add_device<AndGate, AndIcon>(and_gate, 10, 6);
         and_gate->A1->feed = in[0]->Y;
         and_gate->A2->feed = in[1]->Y;
         outputs[1] = and_gate->Y;
     }
     {
         auto *or_gate = board.circuit.add_component<OrGate>();
-        board.add_device<OrGate, OrIcon>(or_gate, Vector2 { 10, 10 });
+        board.add_device<OrGate, OrIcon>(or_gate, 10, 10);
         or_gate->A1->feed = in[0]->Y;
         or_gate->A2->feed = in[1]->Y;
         outputs[2] = or_gate->Y;
     }
     {
         auto *xor_gate = board.circuit.add_component<XorGate>();
-        board.add_device<XorGate, XorIcon>(xor_gate, Vector2 { 10, 14 });
+        board.add_device<XorGate, XorIcon>(xor_gate, 10, 14);
         xor_gate->A1->feed = in[0]->Y;
         xor_gate->A2->feed = in[1]->Y;
         outputs[3] = xor_gate->Y;
     }
     {
         auto *tristate = board.circuit.add_component<TriStateBuffer>();
-        board.add_device<TriStateBuffer, TriStateIcon>(tristate, Vector2 { 10, 18 });
+        board.add_device<TriStateBuffer, TriStateIcon>(tristate, 10, 18);
         tristate->A->feed = in[0]->Y;
         tristate->E->feed = in[1]->Y;
         outputs[4] = tristate->Y;
     }
-    auto S = board.add_package<DIPSwitch<2, Orientation::North>>(Vector2 { 2, 9 });
+    auto S = board.add_package<DIPSwitch<2, Orientation::North>>(2, 9);
     connect(in, S);
-    auto L = board.add_package<LEDArray<5, Orientation::North>>(Vector2 { 17, 7 });
+    auto L = board.add_package<LEDArray<5, Orientation::North>>(17, 7);
     connect(outputs, L);
 }
 

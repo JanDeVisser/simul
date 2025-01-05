@@ -23,8 +23,8 @@ LS08::LS08()
 void LS08_test(Board &board)
 {
     board.circuit.name = "LS08 Test";
-    auto *ls08 = board.circuit.add_component<LS08>();
-    board.add_device<LS08, DIP<14, Orientation::North>>(ls08, Vector2 { 10, 6 });
+    board.circuit.add_component<LS08>();
+    auto *ls08 = board.add_device<LS08, DIP<14, Orientation::North>>(10, 6);
     std::array<TieDown *, 8> in {};
     std::array<Pin*,4> outputs {};
     for (auto gate = 0; gate < 4; ++gate) {
@@ -34,9 +34,9 @@ void LS08_test(Board &board)
         ls08->B[gate]->feed = in[2*gate+1]->Y;
         outputs[gate] = ls08->Y[gate];
     }
-    auto S = board.add_package<DIPSwitch<8, Orientation::North>>(Vector2 { 2, 3 });
+    auto S = board.add_package<DIPSwitch<8, Orientation::North>>(2, 3);
     connect(in, S);
-    auto L = board.add_package<LEDArray<4, Orientation::North>>(Vector2 { 17, 6 });
+    auto L = board.add_package<LEDArray<4, Orientation::North>>(17, 6);
     connect(outputs, L);
 }
 

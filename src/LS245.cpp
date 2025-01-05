@@ -66,7 +66,7 @@ struct ChannelView : public Package<4> {
 
     void render() override
     {
-        auto p = pin1_tx;
+        auto p { pin1_tx };
         DrawRectangleLines(p.x + PITCH, p.y + PITCH, 4 * PITCH, 4 * PITCH, BLACK);
         DrawTriangleLines(
             { p.x + PITCH, p.y + 3.4f * PITCH },
@@ -96,15 +96,12 @@ void LS245_channel_test(Board &board)
     inputs[0] = DIR->Y;
     auto *OE_ = board.circuit.add_component<TieDown>(PinState::High);
     inputs[1] = OE_->Y;
-    auto *S = board.add_package<DIPSwitch<2, Orientation::North>>(Vector2 { 10, 1 });
+    auto *S = board.add_package<DIPSwitch<2, Orientation::North>>(10, 1);
     connect(inputs, S);
 
-    auto *OEinv = board.circuit.add_component<Inverter>();
-    board.add_device<Inverter, InverterIcon>(OEinv, Vector2 { 1, 5 });
-    auto *ASide = board.circuit.add_component<AndGate>();
-    board.add_device<AndGate, AndIcon>(ASide, Vector2 { 5, 5 });
-    auto *BSide = board.circuit.add_component<NorGate>();
-    board.add_device<NorGate, NorIcon>(BSide, Vector2 { 10, 5 });
+    auto *OEinv = board.add_device<Inverter, InverterIcon>(1, 5);
+    auto *ASide = board.add_device<AndGate, AndIcon>(5, 5);
+    auto *BSide = board.add_device<NorGate, NorIcon>(10, 5);
     OEinv->A->feed = OE_->Y;
     ASide->A1->feed = DIR->Y;
     ASide->A2->feed = OEinv->Y;
@@ -112,11 +109,11 @@ void LS245_channel_test(Board &board)
     BSide->A2->feed = OE_->Y;
 
     auto *A = board.circuit.add_component<TieDown>(PinState::Z);
-    auto *Sw_A = board.add_package<TriStateSwitch<1, Orientation::North>>(Vector2 { 5, 10 });
+    auto *Sw_A = board.add_package<TriStateSwitch<1, Orientation::North>>(5, 10);
     connect(A->Y, Sw_A);
 
     auto *B = board.circuit.add_component<TieDown>(PinState::Z);
-    auto *Sw_B = board.add_package<TriStateSwitch<1, Orientation::North>>(Vector2 { 15, 10 });
+    auto *Sw_B = board.add_package<TriStateSwitch<1, Orientation::North>>(15, 10);
     connect(B->Y, Sw_B);
 
     auto *channel = board.circuit.add_component<LS245::Channel>();
@@ -126,31 +123,30 @@ void LS245_channel_test(Board &board)
     channel->B->O->feed = B->Y;
     channel->DIR->feed = DIR->Y;
 
-    board.add_device<TriStateBuffer, TriStateIcon>(channel->Abuf, Vector2 { 5, 14});
-    board.add_device<TriStateBuffer, TriStateIcon>(channel->Bbuf, Vector2 { 15, 14});
+    board.add_device<TriStateBuffer, TriStateIcon>(channel->Abuf, 5, 14);
+    board.add_device<TriStateBuffer, TriStateIcon>(channel->Bbuf, 15, 14);
 
-    auto *L_A = board.add_package<LEDArray<1, Orientation::North>>(Vector2 { 6, 18 });
+    auto *L_A = board.add_package<LEDArray<1, Orientation::North>>(6, 18);
     connect(channel->A->O, L_A);
-    auto *L_B = board.add_package<LEDArray<1, Orientation::North>>(Vector2 { 16, 18 });
+    auto *L_B = board.add_package<LEDArray<1, Orientation::North>>(16, 18);
     connect(channel->B->O, L_B);
 }
 
 void LS245_test(Board &board)
 {
     board.circuit.name = "LS245 Test";
-    auto *ls245 = board.circuit.add_component<LS245>();
-    board.add_device<LS245, DIP<20, Orientation::North>>(ls245, Vector2 { 3, 29 });
+    auto *ls245 = board.add_device<LS245, DIP<20, Orientation::North>>(3, 29);
 
     auto  inputs = std::array<Pin *, 2> {};
     auto *DIR = board.circuit.add_component<TieDown>(PinState::High);
     inputs[0] = DIR->Y;
     auto *OE_ = board.circuit.add_component<TieDown>(PinState::High);
     inputs[1] = OE_->Y;
-    auto *S = board.add_package<DIPSwitch<2, Orientation::North>>(Vector2 { 6, 1 });
+    auto *S = board.add_package<DIPSwitch<2, Orientation::North>>(6, 1);
     connect(inputs, S);
-    board.add_text({1,1}, "DIR");
-    board.add_text({13, 1}, "H: A->B, L: B->A");
-    board.add_text({1, 3}, "OE_");
+    board.add_text(1, 1, "DIR");
+    board.add_text(13, 1, "H: A->B, L: B->A");
+    board.add_text(1, 3, "OE_");
 
     ls245->DIR->feed = DIR->Y;
     ls245->OE_->feed = OE_->Y;
@@ -170,13 +166,13 @@ void LS245_test(Board &board)
             tiedown->Y->feed = ls245->B[bit];
             ls245->B[bit]->feed = tiedown->Y;
         }
-        board.add_device<LS245::Channel, ChannelView>(ls245->channels[bit], Vector2 { 13, 9.0f + bit * 8 });
+        board.add_device<LS245::Channel, ChannelView>(ls245->channels[bit], 13, 9 + bit * 8);
     }
-    auto *A_sw = board.add_package<TriStateSwitch<8, Orientation::North>>(Vector2 { 1, 9 });
+    auto *A_sw = board.add_package<TriStateSwitch<8, Orientation::North>>(1, 9);
     connect(a_switches, A_sw);
-    board.add_text({1, 6}, "A0-A7");
-    auto *B_sw = board.add_package<TriStateSwitch<8, Orientation::North>>(Vector2 { 23, 9 });
-    board.add_text({23, 6}, "B0-B7");
+    board.add_text(1, 6, "A0-A7");
+    auto *B_sw = board.add_package<TriStateSwitch<8, Orientation::North>>(23, 9);
+    board.add_text(23, 6, "B0-B7");
     connect(b_switches, B_sw);
 }
 

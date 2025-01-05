@@ -6,32 +6,42 @@
 
 #pragma once
 
+#include "ControlBus.h"
+#include "GP_Register.h"
+#include "Circuit.h"
 #include "Graphics.h"
+#include "LS04.h"
+#include "LS08.h"
+#include "LS138.h"
+#include "LS245.h"
+#include "LS32.h"
+#include "LS377.h"
+#include "System.h"
 #include "UtilityDevice.h"
 
 namespace Simul {
 
-struct ControlBus : public TriStateSwitch<40, Orientation::North> {
-    Pin                      *CLK;
-    Pin                      *XDATA_;
-    Pin                      *XADDR_;
-    Pin                      *IO_;
-    std::array<Pin *, 4>      OP {};
-    std::array<Pin *, 4>      PUT {};
-    std::array<Pin *, 4>      GET {};
-    std::array<Pin *, 8>      D {};
-    std::array<Pin *, 8>      ADDR {};
-    std::array<TieDown *, 40> tiedowns {};
+struct GP_Register : public Device {
+    int reg_no {0};
+    ControlBus *bus;
+    LS138 *U1;
+    LS138 *U2;
+    LS245 *U3;
+    LS377 *U4;
+    LS04 *U5;
+    LS32 *U6;
+    LS08 *U7;
+    LS32 *U8;
+    Pin *PUT_;
+    Pin *GET_;
+    Pin *IOIn;
+    Pin *IOOut;
+    Pin *In_;
+    Pin *Out_;
 
-    ControlBus(Vector2 pin1, Board *board);
-    void op_label(int op, std::string const& label);
-    void set_op(uint8_t op);
-    void set_put(uint8_t op);
-    void set_get(uint8_t op);
-    void set_data(uint8_t op);
-    void set_addr(uint8_t op);
+    GP_Register(System &system, int reg_no);
 };
 
-void EightBit_GP_Register(Board &);
+Card make_GP_Register(System &system, int reg_no);
 
 }

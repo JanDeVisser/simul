@@ -23,7 +23,7 @@ void ls04_test(Board &board)
 {
     board.circuit.name = "LS139 Test";
     auto *ls04 = board.circuit.add_component<LS04>();
-    auto U = board.add_package<DIP<14, Orientation::North>>(Vector2 { 10, 6 });
+    auto U = board.add_package<DIP<14, Orientation::North>>(10, 6);
     connect(ls04, U);
     std::array<TieDown *, 6> in {};
     std::array<Pin*,6> outputs {};
@@ -32,9 +32,9 @@ void ls04_test(Board &board)
         ls04->A[inverter]->feed = in[inverter]->Y;
         outputs[inverter] = ls04->Y[inverter];
     }
-    auto S = board.add_package<DIPSwitch<6, Orientation::North>>(Vector2 { 2, 3 });
+    auto S = board.add_package<DIPSwitch<6, Orientation::North>>(2, 3);
     connect(in, S);
-    auto L = board.add_package<LEDArray<6, Orientation::North>>(Vector2 { 17, 3 });
+    auto L = board.add_package<LEDArray<6, Orientation::North>>(17, 3);
     connect(outputs, L);
 }
 

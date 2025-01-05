@@ -8,8 +8,8 @@
 
 #include "Circuit.h"
 #include "Graphics.h"
-#include "Latch.h"
 #include "LS377.h"
+#include "Latch.h"
 #include "LogicGate.h"
 #include "Oscillator.h"
 #include "UtilityDevice.h"
@@ -55,26 +55,26 @@ struct LatchView : public Package<4> {
     explicit LatchView(Vector2 pin1)
         : Package<4>(pin1)
     {
-        rect = { pin1_tx.x, pin1_tx.y, 6*PITCH, 6*PITCH };
+        rect = { pin1_tx.x, pin1_tx.y, 6 * PITCH, 6 * PITCH };
     }
 
     void render() override
     {
-        auto p = pin1_tx;
-        DrawRectangleLines(p.x + PITCH, p.y + PITCH, 4*PITCH, 4*PITCH, BLACK);
+        auto p { pin1_tx };
+        DrawRectangleLines(p.x + PITCH, p.y + PITCH, 4 * PITCH, 4 * PITCH, BLACK);
         DrawTriangleLines(
             { p.x + PITCH, p.y + 3.4f * PITCH },
             { p.x + PITCH, p.y + 4.6f * PITCH },
             { p.x + 2 * PITCH, p.y + 4 * PITCH },
             BLACK);
-        DrawCircleV({p.x + PITCH, p.y + 2*PITCH }, 0.4f*PITCH, pin_color(pins[0]));
-        DrawCircleV({p.x + PITCH, p.y + 3*PITCH }, 0.4f*PITCH, pin_color(pins[1]));
-        DrawCircleV({p.x + PITCH, p.y + 4*PITCH }, 0.4f*PITCH, pin_color(pins[2]));
-        DrawCircleV({p.x + 5*PITCH, p.y + 3*PITCH }, 0.4f*PITCH, pin_color(pins[3]));
+        DrawCircleV({ p.x + PITCH, p.y + 2 * PITCH }, 0.4f * PITCH, pin_color(pins[0]));
+        DrawCircleV({ p.x + PITCH, p.y + 3 * PITCH }, 0.4f * PITCH, pin_color(pins[1]));
+        DrawCircleV({ p.x + PITCH, p.y + 4 * PITCH }, 0.4f * PITCH, pin_color(pins[2]));
+        DrawCircleV({ p.x + 5 * PITCH, p.y + 3 * PITCH }, 0.4f * PITCH, pin_color(pins[3]));
     }
 };
 
-template <>
+template<>
 void connect(LS377::Latch *device, LatchView *package)
 {
     package->pins[0] = device->E;
@@ -92,10 +92,10 @@ void LS377_latch_test(Board &board)
     inputs[1] = CLK->Y;
     auto *D = board.circuit.add_component<TieDown>(PinState::Low);
     inputs[2] = D->Y;
-    auto *S = board.add_package<DIPSwitch<3, Orientation::North>>(Vector2 { 5, 5 });
-    board.add_text({1,5}, "E");
-    board.add_text({1,7}, "CLK");
-    board.add_text({1,9}, "D");
+    auto *S = board.add_package<DIPSwitch<3, Orientation::North>>(5, 5);
+    board.add_text(1, 5, "E");
+    board.add_text(1, 7, "CLK");
+    board.add_text(1, 9, "D");
     connect(inputs, S);
 
     auto inv = board.circuit.add_component<Inverter>();
@@ -106,12 +106,12 @@ void LS377_latch_test(Board &board)
     latch->E_->feed = inv->Y;
     latch->CLK->feed = CLK->Y;
     latch->D->feed = D->Y;
-    board.add_device<AndGate, AndIcon>(latch->Dand, Vector2 { 12, 1 });
-    board.add_device<AndGate, AndIcon>(latch->feedback, Vector2 { 18, 1 });
-    board.add_device<OrGate, OrIcon>(latch->combine, Vector2 { 15, 6 });
-    board.add_device<DFlipFlop, DFlipFlopIcon>(latch->flipflop, Vector2 {14, 10});
+    board.add_device<AndGate, AndIcon>(latch->Dand, 12, 1);
+    board.add_device<AndGate, AndIcon>(latch->feedback, 18, 1);
+    board.add_device<OrGate, OrIcon>(latch->combine, 15, 6);
+    board.add_device<DFlipFlop, DFlipFlopIcon>(latch->flipflop, 14, 10);
 
-    auto *L = board.add_package<LEDArray<1, Orientation::North>>(Vector2 { 24, 6 });
+    auto *L = board.add_package<LEDArray<1, Orientation::North>>(24, 6);
     connect(latch->Q, L);
 }
 
@@ -119,14 +119,14 @@ void LS377_test(Board &board)
 {
     board.circuit.name = "LS377 Test";
     auto *ls377 = board.circuit.add_component<LS377>();
-    board.add_device<LS377, DIP<20, Orientation::North>>(ls377, Vector2 { 10, 6 });
+    board.add_device<LS377, DIP<20, Orientation::North>>(ls377, 10, 6);
 
     auto  controls = std::array<Pin *, 2> {};
     auto *E = board.circuit.add_component<TieDown>(PinState::High);
     controls[0] = E->Y;
     auto *CLK = board.circuit.add_component<TieDown>(PinState::Low);
     controls[1] = CLK->Y;
-    auto *S = board.add_package<DIPSwitch<2, Orientation::North>>(Vector2 { 1, 3 });
+    auto *S = board.add_package<DIPSwitch<2, Orientation::North>>(1, 3);
     connect(controls, S);
 
     ls377->CLK->feed = CLK->Y;
@@ -139,11 +139,11 @@ void LS377_test(Board &board)
         d_switches[bit] = tiedown->Y;
         ls377->D[bit]->feed = tiedown->Y;
         d_pins[bit] = tiedown->Y;
-        board.add_device<LS377::Latch, LatchView>(ls377->latches[bit], Vector2 { 16, 1.0f + bit*8 });
+        board.add_device<LS377::Latch, LatchView>(ls377->latches[bit], 16, 1 + bit * 8);
     }
-    auto *data_S = board.add_package<DIPSwitch<8, Orientation::North>>(Vector2 { 1, 9 });
+    auto *data_S = board.add_package<DIPSwitch<8, Orientation::North>>(1, 9);
     connect(d_pins, data_S);
-    auto *L = board.add_package<LEDArray<8, Orientation::North>>(Vector2 { 23, 3 });
+    auto *L = board.add_package<LEDArray<8, Orientation::North>>(23, 3);
     connect(ls377->Q, L);
 }
 
