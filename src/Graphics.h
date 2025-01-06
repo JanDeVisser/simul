@@ -180,6 +180,12 @@ struct DIPSwitch : public Package<S> {
         }
     }
 
+    void layout(float x_off, float y_off) override
+    {
+        Package<S>::layout(x_off, y_off);
+        position = Vector2Add(position, { x_off, y_off});
+    }
+
     void render() override
     {
         DrawRectangleRounded(AbstractPackage::rect, 0.3, 10, BLACK);

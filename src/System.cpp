@@ -7,6 +7,7 @@
 #include "ControlBus.h"
 #include "GP_Register.h"
 #include "Graphics.h"
+#include "Monitor.h"
 #include "System.h"
 
 namespace Simul {
@@ -18,6 +19,7 @@ System::System(Font font)
     bus = make_backplane(*this);
     cards.emplace_back(std::move(make_GP_Register(*this, 0)));
     cards.emplace_back(std::move(make_GP_Register(*this, 1)));
+    cards.emplace_back(std::move(make_Monitor(*this)));
 
     layout();
 
@@ -27,7 +29,6 @@ System::System(Font font)
     bus->set_op(0x00);
     bus->set_put(0x00);
     bus->set_get(0x01);
-    bus->set_data(0xAA);
     bus->set_addr(0);
 }
 

@@ -27,12 +27,13 @@ struct Pin {
     int         pin_nr;
     std::string name;
     PinState    state { PinState::Z };
+    bool        passive { false };
     Pin        *feed { nullptr };
     Pin        *drive { nullptr };
 
     [[nodiscard]] bool on() const;
     [[nodiscard]] bool off() const;
-    void flip();
+    void               flip();
 };
 
 }

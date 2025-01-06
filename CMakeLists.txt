@@ -28,6 +28,7 @@ add_executable(
         src/LS245.cpp
         src/LS377.cpp
         src/LS574.cpp
+        src/Monitor.cpp
         src/Oscillator.cpp
         src/Pin.cpp
         src/System.cpp

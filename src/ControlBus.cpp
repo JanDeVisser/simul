@@ -19,6 +19,9 @@ ControlBus::ControlBus()
     XDATA_ = tiedowns[7]->Y;
     XADDR_ = tiedowns[8]->Y;
     IO_ = tiedowns[15]->Y;
+    for (auto pin = 0; pin < 24; ++pin) {
+        controls[pin] = tiedowns[pin]->Y;
+    }
     for (auto pin = 10; pin < 14; ++pin) {
         OP[pin - 10] = tiedowns[pin]->Y;
     }
@@ -30,9 +33,11 @@ ControlBus::ControlBus()
     }
     for (auto pin = 24; pin < 32; ++pin) {
         D[pin - 24] = tiedowns[pin]->Y;
+        tiedowns[pin]->Y->passive = true;
     }
     for (auto pin = 32; pin < 40; ++pin) {
         ADDR[pin - 32] = tiedowns[pin]->Y;
+        tiedowns[pin]->Y->passive = true;
     }
 }
 
@@ -80,7 +85,13 @@ ControlBus *make_backplane(System &system)
 {
     system.backplane = system.make_board();
     auto &board = *system.backplane;
-    auto  bus = board.add_device<ControlBus, TriStateSwitch<40, Orientation::North>>(9, 1);
+    auto  bus = system.circuit.add_component<ControlBus>();
+    auto controls = board.add_package<TriStateSwitch<24, Orientation::North>>(9, 1);
+    connect(bus->controls, controls);
+    auto  d_leds = board.add_package<LEDArray<8, Orientation::North>>(11, 51);
+    connect(bus->D, d_leds);
+    auto  a_leds = board.add_package<LEDArray<8, Orientation::North>>(11, 68);
+    connect(bus->ADDR, a_leds);
     board.add_text(1, 5, "CLK");
     board.add_text(1, 15, "XDATA_");
     board.add_text(1, 17, "XADDR_");
@@ -89,8 +100,8 @@ ControlBus *make_backplane(System &system)
     board.add_text(1, 33, "PUT0");
     board.add_text(1, 41, "GET0");
     for (auto bit = 0; bit < 8; ++bit) {
-        board.add_text(4, 2 * (25 + bit) - 1, std::format("D{}", bit));
-        board.add_text(4, 2 * (33 + bit) - 1, std::format("A{}", bit));
+        board.add_text(4, 2 * (25 + bit) + 1, std::format("D{}", bit));
+        board.add_text(4, 2 * (33 + bit) + 2, std::format("A{}", bit));
     }
     return bus;
 }

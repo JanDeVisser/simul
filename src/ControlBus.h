@@ -22,6 +22,7 @@ struct ControlBus : public Device {
     std::array<Pin *, 4>      OP {};
     std::array<Pin *, 4>      PUT {};
     std::array<Pin *, 4>      GET {};
+    std::array<Pin *, 24>     controls {};
     std::array<Pin *, 8>      D {};
     std::array<Pin *, 8>      ADDR {};
     std::array<TieDown *, 40> tiedowns {};

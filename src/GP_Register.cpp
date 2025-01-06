@@ -119,7 +119,7 @@ Card make_GP_Register(System &system, int reg_no)
     auto label = std::format("GP {:c}", static_cast<char>(reg_no) + 'A');
     board->add_text(2, 80, label);
     edge->add_text(2, 80, label);
-    return { std::move(board), std::move(edge) };
+    return { std::move(board), std::move(edge), reg_circuit };
 }
 
 }

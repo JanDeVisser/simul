@@ -13,6 +13,7 @@ namespace Simul {
 struct Card {
     std::unique_ptr<Board> board;
     std::unique_ptr<Board> edge;
+    Device                *circuit {};
 };
 
 struct System {
