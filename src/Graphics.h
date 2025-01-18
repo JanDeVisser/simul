@@ -82,7 +82,8 @@ inline Color pin_color(Pin *pin)
 
 template<size_t S, Orientation O = Orientation::West>
 struct LEDArray : public Package<S> {
-    Vector2 incr {};
+    Vector2                                                  incr {};
+    std::array<std::optional<std::function<void(Pin *)>>, S> on_click {};
 
     explicit LEDArray(Vector2 pin1)
         : Package<S>(pin1)
@@ -114,6 +115,24 @@ struct LEDArray : public Package<S> {
         for (auto ix = 0; ix < S; ++ix) {
             auto color = pin_color(Package<S>::pins[ix]);
             DrawRectangleRounded({ p.x + 2, p.y + 2, PITCH * 2.0f - 4, PITCH * 2.0f - 4 }, 1.0, 2, color);
+            p = Vector2Add(p, incr);
+        }
+    }
+
+    void handle_input() override
+    {
+        if (!IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+            return;
+        }
+        Vector2 p { Package<S>::pin1_tx };
+        for (auto ix = 0; ix < S; ++ix) {
+            Rectangle r { p.x, p.y, PITCH * 2, PITCH * 2 };
+            if (CheckCollisionPointRec(GetMousePosition(), r)) {
+                if (on_click[ix]) {
+                    (*on_click[ix])(Package<S>::pins[ix]);
+                }
+                break;
+            }
             p = Vector2Add(p, incr);
         }
     }

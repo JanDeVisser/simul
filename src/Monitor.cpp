@@ -75,12 +75,12 @@ Card make_Monitor(System &system)
     board->add_device<LS08, DIP<14, Orientation::North>>(monitor_circuit->U7, 30, 3, "74LS08", "U7");
 
     auto edge = system.make_board();
-    auto signals = edge->add_package<LEDArray<1, Orientation::North>>(6, 1);
+    auto signals = edge->add_package<LEDArray<1, Orientation::North>>(6, 3);
     connect(monitor_circuit->GET_, signals);
-    auto u3_A = edge->add_package<LEDArray<8, Orientation::North>>(6, 50);
-    connect(monitor_circuit->U3->A, u3_A);
-    auto d_bus = edge->add_package<LEDArray<8, Orientation::North>>(3, 50);
-    connect(monitor_circuit->bus->D, d_bus);
+    edge->add_text(1, 3, "GET_");
+    signals->on_click[0] = [&system](Pin *) -> void {
+        set_pins(system.bus->GET, 0xE);
+    };
 
     auto d_switches = edge->add_package<DIPSwitch<8, Orientation::North>>(6, 10);
     connect(monitor_circuit->SW1, d_switches);
