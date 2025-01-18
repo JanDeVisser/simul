@@ -69,7 +69,6 @@ size_t Circuit::simulate(duration d)
         if (all_pins[ix].state != all_pins[ix].new_state && p.on_change) {
             (*p.on_change)(&p, d);
         }
-        all_pins[ix].state = all_pins[ix].new_state;
     }
     std::function<void(Device *)> recurse = [&recurse, d](Device *dev) -> void {
         for (auto *c : dev->components) {
@@ -85,7 +84,17 @@ size_t Circuit::simulate(duration d)
         }
     });
     for (auto ix = 0; ix < pin_count; ++ix) {
+        auto &p = all_pins[ix];
+        if (p.on_drive) {
+            (*p.on_drive)(&p, d);
+        }
+        if (p.new_driving && p.drive && p.new_state != PinState::Z) {
+            p.drive->new_state = p.new_state;
+        }
+    }
+    for (auto ix = 0; ix < pin_count; ++ix) {
         all_pins[ix].state = all_pins[ix].new_state;
+        all_pins[ix].driving = all_pins[ix].new_driving;
     }
     return ret;
 }
@@ -119,6 +128,7 @@ std::thread Circuit::start_simulation()
                     }
                     for (auto ix = 0; ix < pin_count; ++ix) {
                         all_pins[ix].new_state = all_pins[ix].state;
+                        all_pins[ix].new_driving = all_pins[ix].driving;
                     }
                 }
                 auto now { std::chrono::high_resolution_clock::now() };

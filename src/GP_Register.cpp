@@ -40,18 +40,18 @@ GP_Register::GP_Register(System &system, int reg_no)
     U1->A->feed = bus->PUT[0];
     U1->B->feed = bus->PUT[1];
     U1->C->feed = bus->PUT[2];
-    U1->G1->feed = VCC;
+    U1->G1->feed = Circuit::the().VCC;
     U1->G2A->feed = bus->XDATA_;
     U1->G2B->feed = bus->PUT[3];
 
     U2->A->feed = bus->GET[0];
     U2->B->feed = bus->GET[1];
     U2->C->feed = bus->GET[2];
-    U2->G1->feed = VCC;
-    U2->G2A->feed = GND;
+    U2->G1->feed = Circuit::the().VCC;
+    U2->G2A->feed = Circuit::the().GND;
     U2->G2B->feed = bus->GET[3];
 
-    U3->DIR->feed = GND;
+    U3->DIR->feed = Circuit::the().GND;
     U3->OE_->feed = GET_;
     for (auto bit = 0; bit < 8; ++bit) {
         U3->A[bit]->drive = bus->D[bit];

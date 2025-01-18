@@ -21,7 +21,6 @@ struct LS377 : public Device {
         Pin *D;
         Pin *Q;
         Pin *E;
-        Pin *E_;
         Pin *CLK;
 
         AndGate   *Dand;

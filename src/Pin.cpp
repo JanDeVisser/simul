@@ -57,9 +57,6 @@ bool Pin::update(duration d)
             (*on_update)(this, d);
         }
     }
-    if (drive && new_state != PinState::Z) {
-        drive->new_state = new_state;
-    }
     return state != new_state;
 }
 

@@ -65,6 +65,8 @@ DFlipFlop::DFlipFlop()
     SET_ = a_input->S_Gate->pin(3);
     CLK = a_input->R_;
     CLR_ = a_input->R_Gate->pin(3);
+    SET_->state = PinState::High;
+    CLR_->state = PinState::High;
 
     d_input->S_->feed = CLK;
     d_input->S_Gate->pin(3)->feed = a_input->Q_;

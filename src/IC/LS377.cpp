@@ -27,11 +27,13 @@ LS377::Latch::Latch()
     CLK = flipflop->CLK;
     E = Dand->A1;
     D = Dand->A2;
-    E_ = feedback->A1;
+    invert(E, feedback->A1);
     feedback->A2->feed = flipflop->Q;
     combine->A1->feed = Dand->Y;
     combine->A2->feed = feedback->Y;
     flipflop->D->feed = combine->Y;
+    flipflop->SET_->state = PinState::High;
+    flipflop->CLR_->state = PinState::High;
     Q = flipflop->Q;
 }
 
@@ -43,7 +45,6 @@ LS377::LS377()
     CLK = add_pin(11, "CLK");
     for (auto bit = 0; bit < 8; ++bit) {
         latches[bit] = add_component<Latch>();
-        latches[bit]->E_->feed = E_;
         latches[bit]->E->feed = Einv->Y;
         latches[bit]->CLK->feed = CLK;
         D[bit] = latches[bit]->D;
@@ -103,15 +104,14 @@ void LS377_latch_test(Board &board)
 
     auto *latch = board.circuit.add_component<LS377::Latch>();
     latch->E->feed = E->Y;
-    latch->E_->feed = inv->Y;
     latch->CLK->feed = CLK->Y;
     latch->D->feed = D->Y;
     board.add_device<AndGate, AndIcon>(latch->Dand, 12, 1);
-    board.add_device<AndGate, AndIcon>(latch->feedback, 18, 1);
-    board.add_device<OrGate, OrIcon>(latch->combine, 15, 6);
-    board.add_device<DFlipFlop, DFlipFlopIcon>(latch->flipflop, 14, 10);
+    board.add_device<AndGate, AndIcon>(latch->feedback, 19, 1);
+    board.add_device<OrGate, OrIcon>(latch->combine, 15, 8);
+    board.add_device<DFlipFlop, DFlipFlopIcon>(latch->flipflop, 15, 15);
 
-    auto *L = board.add_package<LEDArray<1, Orientation::North>>(24, 6);
+    auto *L = board.add_package<LEDArray<1, Orientation::North>>(27, 10);
     connect(latch->Q, L);
 }
 

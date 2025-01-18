@@ -38,18 +38,18 @@ Monitor::Monitor(System &system)
     U1->A->feed = bus->GET[1];
     U1->B->feed = bus->GET[2];
     U1->C->feed = bus->GET[3];
-    U1->G1->feed = VCC;
+    U1->G1->feed = Circuit::the().VCC;
     U1->G2A->feed = U7->Y[0];
     U1->G2B->feed = bus->GET[0];
 
-    U3->DIR->feed = GND;
+    U3->DIR->feed = Circuit::the().GND;
     U3->OE_->feed = GET_;
     for (auto bit = 0; bit < 8; ++bit) {
         U3->A[bit]->drive = bus->D[bit];
         U3->B[bit]->feed = SW1[bit];
     }
 
-    U4->DIR->feed = GND;
+    U4->DIR->feed = Circuit::the().GND;
     U4->OE_->feed = U6->Y[0];
     for (auto bit = 0; bit < 8; ++bit) {
         U4->A[bit]->drive = bus->ADDR[bit];
@@ -77,6 +77,10 @@ Card make_Monitor(System &system)
     auto edge = system.make_board();
     auto signals = edge->add_package<LEDArray<1, Orientation::North>>(6, 1);
     connect(monitor_circuit->GET_, signals);
+    auto u3_A = edge->add_package<LEDArray<8, Orientation::North>>(6, 50);
+    connect(monitor_circuit->U3->A, u3_A);
+    auto d_bus = edge->add_package<LEDArray<8, Orientation::North>>(3, 50);
+    connect(monitor_circuit->bus->D, d_bus);
 
     auto d_switches = edge->add_package<DIPSwitch<8, Orientation::North>>(6, 10);
     connect(monitor_circuit->SW1, d_switches);

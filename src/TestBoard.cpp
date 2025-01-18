@@ -16,6 +16,7 @@
 
 #include "IC/LS193.h"
 #include "IC/LS245.h"
+#include "IC/LS377.h"
 
 namespace Simul {
 
@@ -349,6 +350,10 @@ void main(int argc, char **argv)
                 test_board<LS193_Bit0>(board);
             } else if (device == "LS245") {
                 LS245_test(board);
+            } else if (device == "LS377") {
+                LS377_test(board);
+            } else if (device == "LS377_Latch") {
+                LS377_latch_test(board);
             } else if (device == "TFlipFlop") {
                 test_board<TFlipFlop>(board);
             } else {

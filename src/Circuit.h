@@ -41,7 +41,7 @@ struct Circuit : public Device {
 
     static Circuit &the();
 
-private:
+protected:
     Circuit()
         : Device("")
     {
@@ -50,6 +50,7 @@ private:
         pin_count = 2;
     }
 
+private:
     static Circuit _the;
 };
 

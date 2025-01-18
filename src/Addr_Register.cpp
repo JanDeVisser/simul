@@ -32,9 +32,9 @@ Addr_Register::Addr_Register(System &system, int reg_no)
 
     U1->A->feed = bus->PUT[0];
     U1->B->feed = bus->PUT[1];
-    U1->C->feed = GND;
+    U1->C->feed = Circuit::the().GND;
     U1->G1->feed = bus->PUT[3];
-    U1->G2A->feed = GND;
+    U1->G2A->feed = Circuit::the().GND;
     U1->G2B->feed = bus->PUT[2];
 
     Put_ = U1->Y[reg_no - 8];
@@ -47,9 +47,9 @@ Addr_Register::Addr_Register(System &system, int reg_no)
 
     U2->A->feed = bus->GET[0];
     U2->B->feed = bus->GET[1];
-    U2->C->feed = GND;
+    U2->C->feed = Circuit::the().GND;
     U2->G1->feed = bus->PUT[3];
-    U2->G2A->feed = GND;
+    U2->G2A->feed = Circuit::the().GND;
     U2->G2B->feed = bus->GET[2];
 
     Get_ = U2->Y[reg_no - 8];
@@ -63,9 +63,9 @@ Addr_Register::Addr_Register(System &system, int reg_no)
     U3->A->feed = MSB;
     U3->B->feed = DPut_;
     U3->C->feed = DGet_;
-    U3->G1 = VCC;
+    U3->G1 = Circuit::the().VCC;
     U3->G2A = bus->XDATA_;
-    U3->G2B = GND;
+    U3->G2B = Circuit::the().GND;
 
     MSBGet_ = U3->Y[3];
     U5->A[0]->feed = U3->Y[2];
@@ -129,7 +129,7 @@ Addr_Register::Addr_Register(System &system, int reg_no)
         U10->D[bit]->feed = U18->Z[bit];
     }
 
-    U14->DIR->feed = GND;
+    U14->DIR->feed = Circuit::the().GND;
     U14->OE_->feed = LSBGet_;
     for (auto bit = 0; bit < 4; ++bit) {
         U14->A[bit]->drive = bus->D[bit];
@@ -140,7 +140,7 @@ Addr_Register::Addr_Register(System &system, int reg_no)
         U14->B[bit]->feed = U11->Q[bit - 4];
     }
 
-    U15->DIR->feed = GND;
+    U15->DIR->feed = Circuit::the().GND;
     U15->OE_->feed = MSBGet_;
     for (auto bit = 0; bit < 4; ++bit) {
         U15->A[bit]->drive = bus->D[bit];
@@ -151,7 +151,7 @@ Addr_Register::Addr_Register(System &system, int reg_no)
         U15->B[bit]->feed = U13->Q[bit - 4];
     }
 
-    U16->DIR->feed = GND;
+    U16->DIR->feed = Circuit::the().GND;
     U16->OE_->feed = AGet_;
     for (auto bit = 0; bit < 4; ++bit) {
         U16->A[bit]->drive = bus->ADDR[bit];

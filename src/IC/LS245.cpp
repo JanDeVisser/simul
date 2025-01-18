@@ -28,9 +28,14 @@ LS245::Channel::Channel()
     simulate_device = [this](Device *, duration) -> void {
         if (AE->on()) {
             B->new_state = Abuf->Y->new_state;
-        }
-        if (BE->on()) {
+            B->new_driving = true;
+            A->new_driving = false;
+        } else if (BE->on()) {
             A->new_state = Bbuf->Y->new_state;
+            A->new_driving = true;
+            B->new_driving = false;
+        } else {
+            B->new_driving = A->new_driving = false;
         }
     };
 }

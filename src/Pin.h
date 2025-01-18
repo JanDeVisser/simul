@@ -32,11 +32,14 @@ struct Pin {
 
     int                    pin_nr { 1 };
     std::string            name {};
+    bool                   driving;
     PinState               state { PinState::Z };
     std::optional<Handler> on_change {};
     std::optional<Handler> on_update {};
+    std::optional<Handler> on_drive {};
     Pin                   *feed { nullptr };
     Pin                   *drive { nullptr };
+    bool                   new_driving { false };
     PinState               new_state { PinState::Z };
 
     Pin() = default;

@@ -17,7 +17,7 @@ struct Card {
 };
 
 struct System {
-    Circuit                circuit;
+    Circuit               &circuit;
     struct ControlBus     *bus;
     int                    current_card { 0 };
     std::unique_ptr<Board> backplane;
