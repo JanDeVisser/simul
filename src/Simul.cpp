@@ -10,9 +10,6 @@
 #include <raylib.h>
 
 #include "Graphics.h"
-#include "GP_Register.h"
-#include "LS245.h"
-#include "LS377.h"
 #include "System.h"
 
 namespace Simul {
@@ -25,30 +22,16 @@ void main()
         SetTargetFPS(60);
         auto font = LoadFontEx("fonts/Tecnico-Bold.ttf", 20, nullptr, 0);
         {
-
-            Circuit circuit;
-            System system(font) ;
-//            LS245_test(board);
-            auto        time = std::chrono::high_resolution_clock::now();
-            auto        quit { false };
-            std::thread t { [&]() {
-                               auto start = std::chrono::high_resolution_clock::now();
-                               auto current = start;
-                               do {
-                                   system.circuit.simulate_step(current - start);
-                                   std::this_thread::sleep_for(1ms);
-                                   current = std::chrono::high_resolution_clock::now();
-                               } while (!quit);
-                           } };
-
+            System system(font);
             SetWindowSize(static_cast<int>(system.size.x), static_cast<int>(system.size.y));
+            auto t = system.circuit.start_simulation();
             while (!WindowShouldClose()) {
                 system.handle_input();
                 BeginDrawing();
                 system.render();
                 EndDrawing();
             }
-            quit = true;
+            system.circuit.stop();
             t.join();
         }
         UnloadFont(font);

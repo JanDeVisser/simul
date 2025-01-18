@@ -6,12 +6,12 @@
 
 #include "GP_Register.h"
 #include "ControlBus.h"
-#include "LS04.h"
-#include "LS08.h"
-#include "LS32.h"
-#include "LS138.h"
-#include "LS245.h"
-#include "LS377.h"
+#include "IC/LS04.h"
+#include "IC/LS08.h"
+#include "IC/LS138.h"
+#include "IC/LS245.h"
+#include "IC/LS32.h"
+#include "IC/LS377.h"
 #include "System.h"
 
 namespace Simul {
@@ -21,8 +21,6 @@ GP_Register::GP_Register(System &system, int reg_no)
     , bus(system.bus)
     , reg_no(reg_no)
 {
-    auto *VCC = add_component<TieDown>(PinState::High)->Y;
-    auto *GND = add_component<TieDown>(PinState::Low)->Y;
     U1 = add_component<LS138>();
     U2 = add_component<LS138>();
     U3 = add_component<LS245>();
@@ -89,7 +87,7 @@ GP_Register::GP_Register(System &system, int reg_no)
 
 Card make_GP_Register(System &system, int reg_no)
 {
-    auto board = system.make_board();
+    auto  board = system.make_board();
     auto *reg_circuit = system.circuit.add_component<GP_Register>(system, reg_no);
     bus_label(*board, 0, "IOin");
     bus_label(*board, 3, "IOout");

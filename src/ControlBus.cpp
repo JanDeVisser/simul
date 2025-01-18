@@ -16,8 +16,10 @@ ControlBus::ControlBus()
         tiedowns[pin] = add_component<TieDown>(PinState::Z);
     }
     CLK = tiedowns[2]->Y;
+    CLK_ = tiedowns[3]->Y;
     XDATA_ = tiedowns[7]->Y;
     XADDR_ = tiedowns[8]->Y;
+    RST = tiedowns[14]->Y;
     IO_ = tiedowns[15]->Y;
     for (auto pin = 0; pin < 24; ++pin) {
         controls[pin] = tiedowns[pin]->Y;
@@ -33,11 +35,9 @@ ControlBus::ControlBus()
     }
     for (auto pin = 24; pin < 32; ++pin) {
         D[pin - 24] = tiedowns[pin]->Y;
-        tiedowns[pin]->Y->passive = true;
     }
     for (auto pin = 32; pin < 40; ++pin) {
         ADDR[pin - 32] = tiedowns[pin]->Y;
-        tiedowns[pin]->Y->passive = true;
     }
 }
 
@@ -86,11 +86,11 @@ ControlBus *make_backplane(System &system)
     system.backplane = system.make_board();
     auto &board = *system.backplane;
     auto  bus = system.circuit.add_component<ControlBus>();
-    auto controls = board.add_package<TriStateSwitch<24, Orientation::North>>(9, 1);
+    auto  controls = board.add_package<TriStateSwitch<24, Orientation::North>>(9, 1);
     connect(bus->controls, controls);
-    auto  d_leds = board.add_package<LEDArray<8, Orientation::North>>(11, 51);
+    auto d_leds = board.add_package<LEDArray<8, Orientation::North>>(11, 51);
     connect(bus->D, d_leds);
-    auto  a_leds = board.add_package<LEDArray<8, Orientation::North>>(11, 68);
+    auto a_leds = board.add_package<LEDArray<8, Orientation::North>>(11, 68);
     connect(bus->ADDR, a_leds);
     board.add_text(1, 5, "CLK");
     board.add_text(1, 15, "XDATA_");

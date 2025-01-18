@@ -6,12 +6,12 @@
 
 #include "Monitor.h"
 #include "ControlBus.h"
-#include "LS04.h"
-#include "LS08.h"
-#include "LS138.h"
-#include "LS245.h"
-#include "LS32.h"
-#include "LS377.h"
+#include "IC/LS04.h"
+#include "IC/LS08.h"
+#include "IC/LS138.h"
+#include "IC/LS245.h"
+#include "IC/LS32.h"
+#include "IC/LS377.h"
 #include "System.h"
 
 namespace Simul {
@@ -20,8 +20,6 @@ Monitor::Monitor(System &system)
     : Device("Monitor")
     , bus(system.bus)
 {
-    auto *VCC = add_component<TieDown>(PinState::High)->Y;
-    auto *GND = add_component<TieDown>(PinState::Low)->Y;
     U1 = add_component<LS138>();
     U3 = add_component<LS245>();
     U4 = add_component<LS245>();
@@ -71,8 +69,8 @@ Card make_Monitor(System &system)
     auto *monitor_circuit = system.circuit.add_component<Monitor>(system);
 
     board->add_device<LS138, DIP<16, Orientation::North>>(monitor_circuit->U1, 10, 26, "74LS138", "U1");
-    board->add_device<LS245, DIP<20, Orientation::North>>(monitor_circuit->U3, 30, 26, "74LS245", "U3");
-    board->add_device<LS245, DIP<20, Orientation::North>>(monitor_circuit->U3, 30, 46, "74LS245", "U4");
+    board->add_device<LS245, DIP<20, Orientation::North>>(monitor_circuit->U3, 26, 26, "74LS245", "U3");
+    board->add_device<LS245, DIP<20, Orientation::North>>(monitor_circuit->U4, 36, 26, "74LS245", "U4");
     board->add_device<LS32, DIP<14, Orientation::North>>(monitor_circuit->U6, 20, 3, "74LS32", "U6");
     board->add_device<LS08, DIP<14, Orientation::North>>(monitor_circuit->U7, 30, 3, "74LS08", "U7");
 

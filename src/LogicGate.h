@@ -16,7 +16,7 @@ struct Inverter : public Device {
     Pin *Y;
 
     explicit Inverter(std::string const &ref = "");
-    void simulate(duration) override;
+    Inverter(Pin *in, Pin *out);
 };
 
 struct InverterIcon : Package<2> {
@@ -37,21 +37,19 @@ struct LogicGate : public Device {
     Pin *Y;
 
     explicit LogicGate(std::string const &name, int inputs = 2, std::string const &ref = "");
-    void             simulate(duration) override;
     virtual PinState operate(PinState s1, PinState s2) = 0;
     virtual PinState finalize(PinState s);
 };
 
-struct LogicIcon : public Package<3>
-{
+struct LogicIcon : public Package<3> {
     explicit LogicIcon(Vector2 pos);
-    void render() override;
-    [[nodiscard]] virtual char const * label() const = 0;
-    [[nodiscard]] virtual bool neg() const { return false; }
+    void                              render() override;
+    [[nodiscard]] virtual char const *label() const = 0;
+    [[nodiscard]] virtual bool        neg() const { return false; }
 };
 
 template<class L, class Icon>
-requires std::derived_from<L, LogicGate> && std::derived_from<Icon, LogicIcon>
+    requires std::derived_from<L, LogicGate> && std::derived_from<Icon, LogicIcon>
 inline void connect(L *device, Icon *package)
 {
     package->pins[0] = device->A1;
@@ -69,7 +67,7 @@ protected:
 
 struct AndIcon : public LogicIcon {
     explicit AndIcon(Vector2 pos);
-    [[nodiscard]] char const * label() const override { return "&"; }
+    [[nodiscard]] char const *label() const override { return "&"; }
 };
 
 struct NandGate : public AndGate {
@@ -92,7 +90,7 @@ protected:
 
 struct OrIcon : public LogicIcon {
     explicit OrIcon(Vector2 pos);
-    [[nodiscard]] char const * label() const override { return ">=1"; }
+    [[nodiscard]] char const *label() const override { return ">=1"; }
 };
 
 struct NorGate : public OrGate {
@@ -112,17 +110,7 @@ struct XorGate : public LogicGate {
 
 struct XorIcon : LogicIcon {
     explicit XorIcon(Vector2 pos);
-    [[nodiscard]] char const * label() const override { return "=1"; }
-};
-
-struct TristatePin : public Device {
-    Pin *I;
-    Pin *O;
-    Pin *DIR;
-    Pin *OE_;
-
-    explicit TristatePin(std::string const &ref = "");
-    void simulate(duration) override;
+    [[nodiscard]] char const *label() const override { return "=1"; }
 };
 
 struct TriStateBuffer : public Device {
@@ -131,7 +119,6 @@ struct TriStateBuffer : public Device {
     Pin *Y;
 
     explicit TriStateBuffer(std::string const &ref = "");
-    void simulate(duration) override;
 };
 
 struct TriStateIcon : Package<3> {

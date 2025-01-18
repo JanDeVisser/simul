@@ -49,6 +49,8 @@ struct Package : public AbstractPackage {
     Vector2              pin1 {};
     Vector2              pin1_tx {};
 
+    constexpr static size_t Bits = S;
+
     explicit Package(Vector2 pin1)
         : pin1(pin1)
         , pin1_tx(Vector2Scale(pin1, PITCH))
@@ -68,7 +70,7 @@ inline Color pin_color(Pin *pin)
     if (!pin) {
         return BLACK;
     }
-    switch (pin->state) {
+    switch (pin->new_state) {
     case PinState::Z:
         return DARKGRAY;
     case PinState::Low:
@@ -173,7 +175,7 @@ struct DIPSwitch : public Package<S> {
         for (auto ix = 0; ix < S; ++ix) {
             Rectangle r { p.x - 1, p.y - 1, double_size.x, double_size.y };
             if (CheckCollisionPointRec(GetMousePosition(), r)) {
-                pins[ix]->state = !pins[ix]->state;
+                pins[ix]->flip();
                 break;
             }
             p = Vector2Add(p, incr);
@@ -183,7 +185,7 @@ struct DIPSwitch : public Package<S> {
     void layout(float x_off, float y_off) override
     {
         Package<S>::layout(x_off, y_off);
-        position = Vector2Add(position, { x_off, y_off});
+        position = Vector2Add(position, { x_off, y_off });
     }
 
     void render() override
@@ -191,7 +193,7 @@ struct DIPSwitch : public Package<S> {
         DrawRectangleRounded(AbstractPackage::rect, 0.3, 10, BLACK);
         Vector2 p { position };
         for (auto ix = 0; ix < S; ++ix) {
-            Color color = (pins[ix] && pins[ix]->on()) ? RED : DARKPURPLE;
+            Color color = pin_color(pins[ix]);
             DrawRectangleV(Vector2Add(p, (pins[ix] && pins[ix]->on()) ? switch_on : switch_off), size, color);
             Rectangle r = { p.x - 1, p.y - 1, double_size.x, double_size.y };
             if (CheckCollisionPointRec(GetMousePosition(), r)) {
@@ -264,19 +266,19 @@ struct TriStateSwitch : public Package<S> {
             {
                 Rectangle r { p.x - 1 + switch_on.x, p.y - 1 + switch_on.y, size.x, size.y };
                 if (CheckCollisionPointRec(GetMousePosition(), r)) {
-                    pins[ix]->state = PinState::High;
+                    pins[ix]->new_state = PinState::High;
                 }
             }
             {
                 Rectangle r { p.x - 1 + switch_off.x, p.y - 1 + switch_off.y, size.x, size.y };
                 if (CheckCollisionPointRec(GetMousePosition(), r)) {
-                    pins[ix]->state = PinState::Low;
+                    pins[ix]->new_state = PinState::Low;
                 }
             }
             {
                 Rectangle r { p.x - 1 + switch_z.x, p.y - 1 + switch_z.y, size.x, size.y };
                 if (CheckCollisionPointRec(GetMousePosition(), r)) {
-                    pins[ix]->state = PinState::Z;
+                    pins[ix]->new_state = PinState::Z;
                 }
             }
             p = Vector2Add(p, incr);
@@ -286,7 +288,7 @@ struct TriStateSwitch : public Package<S> {
     void layout(float x_off, float y_off) override
     {
         Package<S>::layout(x_off, y_off);
-        position = Vector2Add(position, { x_off, y_off});
+        position = Vector2Add(position, { x_off, y_off });
     }
 
     void render() override
@@ -296,7 +298,7 @@ struct TriStateSwitch : public Package<S> {
         for (auto ix = 0; ix < S; ++ix) {
             Color   color = pin_color(pins[ix]);
             Vector2 offset;
-            switch (pins[ix]->state) {
+            switch (pins[ix]->new_state) {
             case PinState::Low:
                 offset = switch_off;
                 break;
@@ -431,6 +433,7 @@ struct Board {
 
     explicit Board(Circuit &circuit, Font font)
         : circuit(circuit)
+        , font(font)
     {
     }
 
@@ -452,7 +455,7 @@ struct Board {
     void render()
     {
         ClearBackground(DARKGREEN);
-        auto outline = Rectangle { rect.x - PITCH *0.25f, rect.y - PITCH*0.25f, rect.width + PITCH*0.5f, rect.height + PITCH*0.5f };
+        auto outline = Rectangle { rect.x - PITCH * 0.25f, rect.y - PITCH * 0.25f, rect.width + PITCH * 0.5f, rect.height + PITCH * 0.5f };
         DrawRectangleRoundedLines(outline, 0.2, 10, 2, GRAY);
         for (auto const &p : packages) {
             p->render();
@@ -474,6 +477,9 @@ struct Board {
 
     void add_text(int px, int py, std::string text, float angle = 0.0f)
     {
+        auto sz = MeasureTextEx(font, text.data(), 20, 2);
+        size.x = std::max(size.x, (static_cast<float>(px) + 1.0f) * PITCH + sz.x);
+        size.y = std::max(size.y, (static_cast<float>(py) + 1.0f) * PITCH);
         texts.emplace_back(px, py, std::move(text), angle);
     }
 
@@ -485,6 +491,30 @@ struct Board {
         size.y = std::max(size.y, ptr->rect.y + ptr->rect.height + PITCH);
         packages.emplace_back(dynamic_cast<AbstractPackage *>(ptr));
         ptr->board = this;
+        return ptr;
+    }
+
+    template<class D, class P, typename... Args>
+    P *add_package(D *device, int px, int py, Args &&...args)
+    {
+        auto *ptr = new P(Vector2 { static_cast<float>(px), static_cast<float>(py) }, args...);
+        size.x = std::max(size.x, ptr->rect.x + ptr->rect.width + PITCH);
+        size.y = std::max(size.y, ptr->rect.y + ptr->rect.height + PITCH);
+        packages.emplace_back(dynamic_cast<AbstractPackage *>(ptr));
+        ptr->board = this;
+        connect(device, ptr);
+        return ptr;
+    }
+
+    template<class P, typename... Args>
+    P *connect_package(std::array<Pin *, P::Bits> const &pins, int px, int py, Args &&...args)
+    {
+        auto *ptr = new P(Vector2 { static_cast<float>(px), static_cast<float>(py) }, args...);
+        size.x = std::max(size.x, ptr->rect.x + ptr->rect.width + PITCH);
+        size.y = std::max(size.y, ptr->rect.y + ptr->rect.height + PITCH);
+        packages.emplace_back(dynamic_cast<AbstractPackage *>(ptr));
+        ptr->board = this;
+        connect(pins, ptr);
         return ptr;
     }
 
@@ -511,4 +541,5 @@ struct Board {
         return device;
     }
 };
+
 }

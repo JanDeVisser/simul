@@ -17,7 +17,6 @@ struct Oscillator : public Device {
     Pin     *Y;
 
     explicit Oscillator(int frequency);
-    void simulate(duration ts) override;
 };
 
 struct OscillatorIcon : Package<1> {

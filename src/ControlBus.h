@@ -16,9 +16,11 @@ namespace Simul {
 
 struct ControlBus : public Device {
     Pin                      *CLK;
+    Pin                      *CLK_;
     Pin                      *XDATA_;
     Pin                      *XADDR_;
     Pin                      *IO_;
+    Pin                      *RST;
     std::array<Pin *, 4>      OP {};
     std::array<Pin *, 4>      PUT {};
     std::array<Pin *, 4>      GET {};
@@ -36,15 +38,6 @@ struct ControlBus : public Device {
 };
 
 void bus_label(Board &board, int op, std::string const& label);
-
-template<size_t Bits>
-void set_pins(std::array<Pin *, Bits> pins, uint8_t value)
-{
-    for (auto ix = 0; ix < Bits; ++ix) {
-        pins[ix]->state = (value & 0x01) ? PinState::High : PinState::Low;
-        value >>= 1;
-    }
-}
 
 ControlBus * make_backplane(System &system);
 

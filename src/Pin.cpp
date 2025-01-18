@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <cassert>
+
 #include "Pin.h"
 
 namespace Simul {
@@ -44,19 +46,36 @@ PinState operator^(PinState const &s1, PinState const &s2)
     return (static_cast<int>(s1) + static_cast<int>(s2) == 5) ? PinState::High : PinState::Low;
 }
 
+bool Pin::update(duration d)
+{
+    if (feed) {
+        if (feed->new_state != PinState::Z && feed->new_state != new_state) {
+            new_state = feed->new_state;
+        }
+    } else {
+        if (on_update) {
+            (*on_update)(this, d);
+        }
+    }
+    if (drive && new_state != PinState::Z) {
+        drive->new_state = new_state;
+    }
+    return state != new_state;
+}
+
 bool Pin::on() const
 {
-    return state == PinState::High;
+    return new_state == PinState::High;
 }
 
 bool Pin::off() const
 {
-    return state != PinState::High;
+    return new_state != PinState::High;
 }
 
 void Pin::flip()
 {
-    state = !state;
+    new_state = !new_state;
 }
 
 }

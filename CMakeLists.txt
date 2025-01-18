@@ -7,37 +7,95 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS on)
 include(cmake/raylib-config.cmake)
 find_package(Freetype)
 
-include_directories(src)
+include_directories(src ${raylib_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
+
+add_library(
+        Circuit
+        STATIC
+        src/Circuit.cpp
+        src/Device.cpp
+        src/Graphics.h
+        src/Latch.cpp
+        src/LogicGate.cpp
+        src/Oscillator.cpp
+        src/Pin.cpp
+        src/UtilityDevice.cpp
+)
+
+target_link_libraries(
+        Circuit
+        ${raylib_LIBRARIES}
+        ${FREETYPE_LIBRARIES}
+        m
+)
+
+add_library(
+        LS
+        STATIC
+        src/IC/LS00.cpp
+        src/IC/LS04.cpp
+        src/IC/LS08.cpp
+        src/IC/LS32.cpp
+        src/IC/LS86.cpp
+        src/IC/LS138.cpp
+        src/IC/LS139.cpp
+        src/IC/LS157.cpp
+        src/IC/LS193.cpp
+        src/IC/LS245.cpp
+        src/IC/LS377.cpp
+        src/IC/LS574.cpp
+)
+
+target_link_libraries(
+        LS
+        Circuit
+        ${raylib_LIBRARIES}
+        ${FREETYPE_LIBRARIES}
+        m
+)
 
 add_executable(
         simul
         src/Simul.cpp
-        src/Circuit.h
+        src/Addr_Register.cpp
         src/ControlBus.cpp
-        src/Device.h
         src/GP_Register.cpp
-        src/Graphics.h
-        src/Latch.cpp
-        src/LogicGate.cpp
-        src/LS04.cpp
-        src/LS08.cpp
-        src/LS32.cpp
-        src/LS86.cpp
-        src/LS138.cpp
-        src/LS139.cpp
-        src/LS245.cpp
-        src/LS377.cpp
-        src/LS574.cpp
         src/Monitor.cpp
-        src/Oscillator.cpp
-        src/Pin.cpp
         src/System.cpp
-        src/UtilityDevice.cpp
 )
 
-target_include_directories(simul PRIVATE ${raylib_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
 target_link_libraries(
         simul
+        Circuit
+        LS
+        ${raylib_LIBRARIES}
+        ${FREETYPE_LIBRARIES}
+        m
+)
+
+add_executable(
+        ChipTester
+        src/ChipTester/ChipTester.cpp
+)
+
+target_link_libraries(
+        ChipTester
+        Circuit
+        LS
+        ${raylib_LIBRARIES}
+        ${FREETYPE_LIBRARIES}
+        m
+)
+
+add_executable(
+        TestBoard
+        src/TestBoard.cpp
+)
+
+target_link_libraries(
+        TestBoard
+        Circuit
+        LS
         ${raylib_LIBRARIES}
         ${FREETYPE_LIBRARIES}
         m

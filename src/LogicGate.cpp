@@ -14,13 +14,20 @@ Inverter::Inverter(std::string const &ref)
 {
     A = add_pin(1, "A");
     Y = add_pin(2, "Y");
+    simulate_device = [this](Device *, duration d) -> void {
+        if (A->new_state != PinState::Z) {
+            Y->new_state = !A->new_state;
+        } else {
+            Y->new_state = PinState::Z;
+        }
+    };
 }
 
-void Inverter::simulate(duration)
+Inverter::Inverter(Pin *in, Pin *out)
+    : Inverter()
 {
-    if (A->state != PinState::Z) {
-        Y->state = !A->state;
-    }
+    A->feed = in;
+    out->feed = Y;
 }
 
 InverterIcon::InverterIcon(Vector2 pos)
@@ -47,20 +54,19 @@ LogicGate::LogicGate(std::string const &name, int inputs, std::string const &ref
 {
     assert(inputs > 1);
     A1 = add_pin(1, "A1");
+    simulate_device = [this](Device *, duration d) -> void {
+        auto s = operate(A1->new_state, A2->new_state);
+        for (auto ix = 2; ix < pins.size() - 1; ++ix) {
+            s = operate(s, pins[ix]->new_state);
+        }
+        s = finalize(s);
+        Y->new_state = s;
+    };
     A2 = add_pin(2, "A2");
-    for (auto ix = 2; ix < inputs; ++ix) {
+    for (auto ix = 3; ix <= inputs; ++ix) {
         add_pin(ix, std::format("A{}", ix));
     }
     Y = add_pin(inputs + 1, "Y");
-}
-
-void LogicGate::simulate(duration)
-{
-    auto s = operate(A1->state, A2->state);
-    for (auto ix = 2; ix < pins.size() - 1; ++ix) {
-        s = operate(s, pins[ix]->state);
-    }
-    Y->state = finalize(s);
 }
 
 PinState LogicGate::finalize(PinState s)
@@ -86,19 +92,24 @@ AndGate::AndGate(std::string const &name, int inputs, std::string const &ref)
 LogicIcon::LogicIcon(Vector2 pos)
     : Package<3>(pos)
 {
-    AbstractPackage::rect = { pin1_tx.x, pin1_tx.y, 4 * PITCH, 4 * PITCH };
+    AbstractPackage::rect = { pin1_tx.x, pin1_tx.y, 6 * PITCH, 6 * PITCH };
 }
 
 void LogicIcon::render()
 {
     auto p = pin1_tx;
-    DrawRectangleLines(p.x + PITCH, p.y + PITCH, 2 * PITCH, 2 * PITCH, BLACK);
-    DrawCircleV({ p.x + PITCH, p.y + 1.25f * PITCH }, PITCH / 4, pin_color(pins[0]));
-    DrawCircleV({ p.x + PITCH, p.y + 2.75f * PITCH }, PITCH / 4, pin_color(pins[1]));
-    DrawCircleV({ p.x + 3 * PITCH, p.y + 2 * PITCH }, PITCH / 4, pin_color(pins[2]));
-    DrawText(label(), p.x + 1.5 * PITCH, p.y + PITCH, 12, BLACK);
+    DrawRectangleLines(p.x + PITCH, p.y + PITCH, 4 * PITCH, 4 * PITCH, BLACK);
+
+    auto inputs = device->pins.size() - 1;
+    assert(inputs > 1);
+    auto y = 3.0f / (static_cast<float>(inputs) - 1.0f);
+    for (auto ix = 0; ix < inputs; ++ix) {
+        DrawCircleV({ p.x + PITCH, p.y + (1.5f + static_cast<float>(ix) * y) * PITCH }, PITCH / 4, pin_color(device->pins[ix]));
+    }
+    DrawCircleV({ p.x + 5 * PITCH, p.y + 3.0f * PITCH }, PITCH / 4, pin_color(dynamic_cast<LogicGate *>(device)->Y));
+    DrawTextPro(board->font, label(), Vector2 { p.x + 1.5f * PITCH, p.y + PITCH }, Vector2 { 0, 0 }, 0, 20, 2, BLACK);
     if (neg()) {
-        DrawCircleLinesV({ p.x + 3.2f * PITCH, p.y + 2 * PITCH }, 0.4f * PITCH, BLACK);
+        DrawCircleLinesV({ p.x + 5.2f * PITCH, p.y + 3 * PITCH }, 0.4f * PITCH, BLACK);
     }
 }
 
@@ -172,43 +183,23 @@ XorIcon::XorIcon(Vector2 pos)
 {
 }
 
-TristatePin::TristatePin(std::string const &ref)
-    : Device("Tri-state pin", ref)
-{
-    I = add_pin(1, "I", PinState::Z);
-    O = add_pin(2, "O", PinState::Z);
-    DIR = add_pin(3, "DIR", PinState::High);
-    OE_ = add_pin(4, "OE_", PinState::High);
-}
-
-void TristatePin::simulate(duration)
-{
-    if (DIR->state == PinState::High) {
-        I->state = (OE_->off()) ? O->state : PinState::Z;
-    } else {
-        O->state = (OE_->off()) ? I->state : PinState::Z;
-    }
-}
-
-
 TriStateBuffer::TriStateBuffer(std::string const &ref)
     : Device("Tri-state buffer", ref)
 {
     A = add_pin(1, "A");
     E = add_pin(1, "E", PinState::Low);
     Y = add_pin(2, "Y");
+    simulate_device = [this](Device *, duration d) -> void {
+        if (E->state == PinState::High) {
+            Y->new_state = A->new_state;
+        }
+    };
 }
-
-void TriStateBuffer::simulate(duration)
-{
-    Y->state = (E->on()) ? A->state : PinState::Z;
-}
-
 
 TriStateIcon::TriStateIcon(Vector2 pos)
     : Package<3>(pos)
 {
-    AbstractPackage::rect = { pin1_tx.x, pin1_tx.y, 4*PITCH, 4*PITCH };
+    AbstractPackage::rect = { pin1_tx.x, pin1_tx.y, 4 * PITCH, 4 * PITCH };
 }
 
 void TriStateIcon::render()
@@ -216,14 +207,13 @@ void TriStateIcon::render()
     auto p = pin1_tx;
     DrawTriangleLines(
         { p.x + PITCH, p.y + PITCH },
-        { p.x + PITCH, p.y + 3*PITCH },
-        { p.x + 3*PITCH, p.y + 2*PITCH },
-        BLACK
-    );
-    DrawLine(p.x + 2*PITCH, p.y + 1.5f*PITCH, p.x + 2*PITCH, p.y + PITCH/2, BLACK);
-    DrawCircleV({p.x + PITCH, p.y + 2*PITCH }, PITCH/4, pin_color(pins[0]));
-    DrawCircleV({p.x + 2*PITCH, p.y + 1.5f*PITCH }, PITCH/4, pin_color(pins[1]));
-    DrawCircleV({p.x + 3*PITCH, p.y + 2*PITCH }, PITCH/4, pin_color(pins[2]));
+        { p.x + PITCH, p.y + 3 * PITCH },
+        { p.x + 3 * PITCH, p.y + 2 * PITCH },
+        BLACK);
+    DrawLine(p.x + 2 * PITCH, p.y + 1.5f * PITCH, p.x + 2 * PITCH, p.y + PITCH / 2, BLACK);
+    DrawCircleV({ p.x + PITCH, p.y + 2 * PITCH }, PITCH / 4, pin_color(pins[0]));
+    DrawCircleV({ p.x + 2 * PITCH, p.y + 1.5f * PITCH }, PITCH / 4, pin_color(pins[1]));
+    DrawCircleV({ p.x + 3 * PITCH, p.y + 2 * PITCH }, PITCH / 4, pin_color(pins[2]));
 }
 
 void LogicGate_test(Board &board)

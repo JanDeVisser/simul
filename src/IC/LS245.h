@@ -18,8 +18,8 @@ namespace Simul {
 
 struct LS245 : public Device {
     struct Channel : public Device {
-        TristatePin    *A;
-        TristatePin    *B;
+        Pin            *A;
+        Pin            *B;
         Pin            *AE;
         Pin            *BE;
         Pin            *DIR;
