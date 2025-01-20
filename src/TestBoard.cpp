@@ -14,6 +14,7 @@
 #include "Oscillator.h"
 #include "UtilityDevice.h"
 
+#include "IC/LS157.h"
 #include "IC/LS193.h"
 #include "IC/LS245.h"
 #include "IC/LS377.h"
@@ -346,6 +347,8 @@ void main(int argc, char **argv)
                     test_board<GatedSRLatch<1>>(board);
                     break;
                 }
+            } else if (device == "LS157") {
+                LS157_test(board);
             } else if (device == "LS193_Bit0") {
                 test_board<LS193_Bit0>(board);
             } else if (device == "LS245") {

@@ -38,6 +38,24 @@ struct Device {
     Pin               *add_pin(int nr, std::string const &pin_name, PinState state = PinState::Z);
     void               invert(Pin *in, Pin *out);
 
+    template<size_t N, size_t S1 = N, size_t S2 = N, size_t O1 = 0, size_t O2 = 0>
+    void connect_pins(std::array<Pin *, S1> x, std::array<Pin *, S2> y)
+    {
+        static_assert(S1 >= O1 + N && S2 >= O2 + N);
+        for (auto ix = 0; ix < N; ++ix) {
+            y[O2 + ix]->feed = x[O1 + ix];
+        }
+    }
+
+    template<size_t N, size_t S1 = N, size_t S2 = N, size_t O1 = 0, size_t O2 = 0>
+    void drive_pins(std::array<Pin *, S1> x, std::array<Pin *, S2> y)
+    {
+        static_assert(S1 >= O1 + N && S2 >= O2 + N);
+        for (auto ix = 0; ix < N; ++ix) {
+            x[O1 + ix]->drive = y[O2 + ix];
+        }
+    }
+
     template<class D, typename... Args>
         requires std::derived_from<D, Device>
     D *add_component(Args &&...args)

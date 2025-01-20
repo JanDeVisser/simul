@@ -110,9 +110,11 @@ Card make_GP_Register(System &system, int reg_no)
     edge->add_text(1, 7, "IOOut");
     signals->on_click[0] = [&system, reg_no](Pin *) -> void {
         set_pins(system.bus->PUT, static_cast<uint8_t>(reg_no));
+        system.bus->XDATA_->state = PinState::Low;
     };
     signals->on_click[1] = [&system, reg_no](Pin *) -> void {
         set_pins(system.bus->GET, static_cast<uint8_t>(reg_no));
+        system.bus->XDATA_->state = PinState::Low;
     };
 
     auto txbus = edge->add_package<LEDArray<8, Orientation::North>>(6, 10);

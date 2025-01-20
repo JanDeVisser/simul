@@ -22,13 +22,13 @@ struct Circuit : public Device {
         Done,
     };
 
-    std::array<Pin, 8192>   all_pins {};
-    size_t                  pin_count { 0 };
-    SimStatus               status { SimStatus::Unstarted };
-    std::mutex              yield_mutex {};
-    std::condition_variable yielder {};
-    Pin                    *VCC { nullptr };
-    Pin                    *GND { nullptr };
+    std::array<Pin, 64 * 1024> all_pins {};
+    size_t                     pin_count { 0 };
+    SimStatus                  status { SimStatus::Unstarted };
+    std::mutex                 yield_mutex {};
+    std::condition_variable    yielder {};
+    Pin                       *VCC { nullptr };
+    Pin                       *GND { nullptr };
 
     void        initialize(std::string const &name = "");
     void        start();

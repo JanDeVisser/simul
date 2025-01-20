@@ -5,6 +5,7 @@
  */
 
 #include "System.h"
+#include "Addr_Register.h"
 #include "ControlBus.h"
 #include "GP_Register.h"
 #include "Graphics.h"
@@ -19,12 +20,20 @@ System::System(Font font)
     bus = make_backplane(*this);
     cards.emplace_back(std::move(make_GP_Register(*this, 0)));
     cards.emplace_back(std::move(make_GP_Register(*this, 1)));
+    cards.emplace_back(std::move(make_GP_Register(*this, 2)));
+    cards.emplace_back(std::move(make_GP_Register(*this, 3)));
+    cards.emplace_back(std::move(make_Addr_Register(*this, 8)));
+    cards.emplace_back(std::move(make_Addr_Register(*this, 9)));
+    cards.emplace_back(std::move(make_Addr_Register(*this, 10)));
+    cards.emplace_back(std::move(make_Addr_Register(*this, 11)));
+    cards.emplace_back(std::move(make_Addr_Register(*this, 12)));
     cards.emplace_back(std::move(make_Monitor(*this)));
 
     layout();
 
     bus->CLK->state = PinState::Low;
-    bus->XDATA_->state = PinState::Low;
+    bus->XDATA_->state = PinState::High;
+    bus->XADDR_->state = PinState::High;
     bus->IO_->state = PinState::High;
     bus->set_op(0x00);
     bus->set_put(0x00);
@@ -52,15 +61,14 @@ void System::layout()
     }
 
     size.y = height + 2 * PITCH;
-    size.x = backplane->size.x + card_width + edge_width + (4.0f + static_cast<float>(cards.size()) - 1.0f) * PITCH;
+    size.x = backplane->size.x + edge_width + (4.0f + static_cast<float>(cards.size()) - 1.0f) * PITCH;
 
     auto x_offset { PITCH };
     backplane->layout(x_offset, PITCH, backplane->size.x, height);
     x_offset += backplane->size.x + PITCH;
-    auto card_offset = x_offset;
-    x_offset += card_width + PITCH;
+    //    x_offset += card_width + PITCH;
     for (auto &card : cards) {
-        card.board->layout(card_offset, PITCH, card_width, height);
+        card.board->layout(0, PITCH, card_width, height);
         card.edge->layout(x_offset, PITCH, card.edge->size.x, height);
         x_offset += card.edge->size.x + PITCH;
     }
@@ -92,7 +100,7 @@ void System::handle_input()
 void System::render()
 {
     backplane->render();
-    cards[current_card].board->render();
+    //    cards[current_card].board->render();
     auto ix = 0;
     for (auto &card : cards) {
         if (ix == current_card) {

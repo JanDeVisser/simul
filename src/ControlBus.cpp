@@ -13,10 +13,11 @@ ControlBus::ControlBus()
     : Device("BUS")
 {
     for (auto pin = 0; pin < 40; ++pin) {
-        tiedowns[pin] = add_component<TieDown>(PinState::Z);
+        tiedowns[pin] = add_component<TieDown>(PinState::Low);
     }
     CLK = tiedowns[2]->Y;
     CLK_ = tiedowns[3]->Y;
+    invert(CLK, CLK_);
     XDATA_ = tiedowns[7]->Y;
     XADDR_ = tiedowns[8]->Y;
     RST = tiedowns[14]->Y;
@@ -93,8 +94,10 @@ ControlBus *make_backplane(System &system)
     auto a_leds = board.add_package<LEDArray<8, Orientation::North>>(11, 68);
     connect(bus->ADDR, a_leds);
     board.add_text(1, 5, "CLK");
+    board.add_text(1, 7, "CLK_");
     board.add_text(1, 15, "XDATA_");
     board.add_text(1, 17, "XADDR_");
+    board.add_text(1, 29, "RST");
     board.add_text(1, 31, "IO_");
     board.add_text(1, 21, "OP0");
     board.add_text(1, 33, "PUT0");
