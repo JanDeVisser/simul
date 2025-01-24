@@ -17,14 +17,14 @@ namespace Simul {
 void main()
 {
     InitWindow(30 * static_cast<int>(PITCH), 30 * static_cast<int>(PITCH), "Simul");
+    SetWindowState(FLAG_VSYNC_HINT);
     {
-        SetWindowState(FLAG_VSYNC_HINT);
+        auto   font = LoadFontEx("fonts/Tecnico-Bold.ttf", 15, nullptr, 0);
+        System system(font);
+        auto   t = system.circuit.start_simulation();
         SetTargetFPS(60);
-        auto font = LoadFontEx("fonts/Tecnico-Bold.ttf", 20, nullptr, 0);
         {
-            System system(font);
             SetWindowSize(static_cast<int>(system.size.x), static_cast<int>(system.size.y));
-            auto t = system.circuit.start_simulation();
             while (!WindowShouldClose()) {
                 system.handle_input();
                 BeginDrawing();

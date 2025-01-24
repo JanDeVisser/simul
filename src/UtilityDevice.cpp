@@ -8,17 +8,6 @@
 
 namespace Simul {
 
-TestPoint::TestPoint(std::string const &ref)
-    : Device("TP", ref)
-{
-    T = add_pin(1, "T");
-}
-
-bool TestPoint::on() const
-{
-    return T->on();
-}
-
 TieDown::TieDown(PinState state, std::string const &ref)
     : Device("TieDown", ref)
 {

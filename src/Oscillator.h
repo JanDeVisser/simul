@@ -19,6 +19,15 @@ struct Oscillator : public Device {
     explicit Oscillator(int frequency);
 };
 
+struct BurstTrigger : public Device {
+    duration burst;
+    duration last_pulse {};
+    Pin     *A;
+    Pin     *Y;
+
+    explicit BurstTrigger(duration burst);
+};
+
 struct OscillatorIcon : Package<1> {
     explicit OscillatorIcon(Vector2 pos);
     void render() override;

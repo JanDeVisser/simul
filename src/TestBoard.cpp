@@ -11,6 +11,7 @@
 
 #include "Graphics.h"
 #include "Latch.h"
+#include "Memory.h"
 #include "Oscillator.h"
 #include "UtilityDevice.h"
 
@@ -315,7 +316,7 @@ void main(int argc, char **argv)
     {
         SetWindowState(FLAG_VSYNC_HINT);
         SetTargetFPS(60);
-        auto font = LoadFontEx("fonts/Tecnico-Bold.ttf", 20, nullptr, 0);
+        auto font = LoadFontEx("fonts/Tecnico-Bold.ttf", 15, nullptr, 0);
         {
             auto &circuit = Circuit::the();
             Board board { circuit, font };
@@ -359,6 +360,8 @@ void main(int argc, char **argv)
                 LS377_latch_test(board);
             } else if (device == "TFlipFlop") {
                 test_board<TFlipFlop>(board);
+            } else if (device == "SRAM") {
+                memory_test(board);
             } else {
                 test_board<JKFlipFlop>(board);
             }

@@ -190,7 +190,7 @@ TriStateBuffer::TriStateBuffer(std::string const &ref)
     E = add_pin(1, "E", PinState::Low);
     Y = add_pin(2, "Y");
     simulate_device = [this](Device *, duration d) -> void {
-        if (E->state == PinState::High) {
+        if (E->new_state == PinState::High) {
             Y->new_driving = true;
             Y->new_state = A->new_state;
         } else {

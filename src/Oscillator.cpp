@@ -59,6 +59,28 @@ void OscillatorIcon::handle_input()
 {
 }
 
+BurstTrigger::BurstTrigger(duration b)
+    : Device("BurstTrigger")
+    , burst(b)
+{
+    A = add_pin(1, "A", PinState::Low);
+    Y = add_pin(2, "Y", PinState::Low);
+    simulate_device = [this](Device *, duration d) -> void {
+        if (A->on()) {
+            if (Y->on()) {
+                if (d - last_pulse > burst) {
+                    Y->new_state = PinState::Low;
+                }
+            } else if (A->state != A->new_state) {
+                Y->new_state = PinState::High;
+                last_pulse = d;
+            }
+        } else {
+            Y->new_state = PinState::Low;
+        }
+    };
+}
+
 void oscillator_test(Board &board)
 {
     board.circuit.name = "Oscillator test";

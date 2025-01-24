@@ -19,7 +19,7 @@ struct Card {
 struct System {
     Circuit               &circuit;
     struct ControlBus     *bus;
-    int                    current_card { 0 };
+    std::optional<int>     current_card {};
     std::unique_ptr<Board> backplane;
     std::vector<Card>      cards;
     Font                   font;

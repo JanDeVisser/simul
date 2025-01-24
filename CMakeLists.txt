@@ -14,11 +14,13 @@ add_library(
         STATIC
         src/Circuit.cpp
         src/Device.cpp
-        src/Graphics.h
+        src/Graphics.cpp
         src/Latch.cpp
         src/LogicGate.cpp
+        src/Memory.cpp
         src/Oscillator.cpp
         src/Pin.cpp
+        src/PushButton.h
         src/UtilityDevice.cpp
 )
 
@@ -62,6 +64,7 @@ add_executable(
         src/GP_Register.cpp
         src/Monitor.cpp
         src/System.cpp
+        src/Mem_Register.cpp
 )
 
 target_link_libraries(

@@ -17,7 +17,7 @@
 namespace Simul {
 
 GP_Register::GP_Register(System &system, int reg_no)
-    : Device(std::format("GP{}", reg_no))
+    : Device(std::format("GP {:c}", static_cast<char>(reg_no) + 'A'))
     , bus(system.bus)
     , reg_no(reg_no)
 {
@@ -109,22 +109,17 @@ Card make_GP_Register(System &system, int reg_no)
     edge->add_text(1, 5, "IOIn");
     edge->add_text(1, 7, "IOOut");
     signals->on_click[0] = [&system, reg_no](Pin *) -> void {
-        set_pins(system.bus->PUT, static_cast<uint8_t>(reg_no));
-        system.bus->XDATA_->state = PinState::Low;
+        system.bus->data_transfer(0xFF, static_cast<uint8_t>(reg_no));
     };
     signals->on_click[1] = [&system, reg_no](Pin *) -> void {
-        set_pins(system.bus->GET, static_cast<uint8_t>(reg_no));
-        system.bus->XDATA_->state = PinState::Low;
+        system.bus->data_transfer(static_cast<uint8_t>(reg_no), 0xFF);
     };
 
-    auto txbus = edge->add_package<LEDArray<8, Orientation::North>>(6, 10);
+    auto txbus = edge->add_package<LEDArray<8, Orientation::North>>(6, 14);
     connect(reg_circuit->U4->Q, txbus);
     for (auto bit = 0; bit < 8; ++bit) {
-        edge->add_text(3, 10 + 2 * bit, std::format("Q{}", bit));
+        edge->add_text(3, 14 + 2 * bit, std::format("Q{}", bit));
     }
-    auto label = std::format("GP {:c}", static_cast<char>(reg_no) + 'A');
-    board->add_text(2, 80, label);
-    edge->add_text(2, 80, label);
     return { std::move(board), std::move(edge), reg_circuit };
 }
 

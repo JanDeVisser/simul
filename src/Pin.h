@@ -66,17 +66,26 @@ void set_pins(std::array<Pin *, Bits> pins, uint8_t value)
     }
 }
 
-template<size_t Bits>
-uint8_t get_pins(std::array<Pin *, Bits> pins)
+template<size_t Bits, typename T = uint8_t>
+T get_pins(std::array<Pin *, Bits> pins)
 {
-    uint8_t ret { 0 };
+    T ret { 0 };
     for (int ix = Bits - 1; ix >= 0; --ix) {
         if (pins[ix]->new_state == PinState::Z) {
-            return 0xFF;
+            return ~static_cast<T>(0);
         }
         ret = (ret << 1) | ((pins[ix]->new_state == PinState::High) ? 0x01 : 0x00);
     }
     return ret;
+}
+
+template<size_t N, size_t S1 = N, size_t S2 = N, size_t O1 = 0, size_t O2 = 0>
+void assign_pins(std::array<Pin *, S1> const &x, std::array<Pin *, S2> &y)
+{
+    static_assert(S1 >= O1 + N && S2 >= O2 + N);
+    for (auto ix = 0; ix < N; ++ix) {
+        y[O2 + ix] = x[O1 + ix];
+    }
 }
 
 }

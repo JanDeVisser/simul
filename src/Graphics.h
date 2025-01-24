@@ -25,7 +25,7 @@ enum class Orientation {
     East = 180,
 };
 
-static constexpr float PITCH = (4 * 2.54f);
+static constexpr float PITCH = (3 * 2.54f);
 
 struct AbstractPackage {
     Device       *device {};
@@ -34,6 +34,9 @@ struct AbstractPackage {
     Rectangle   rect {};
     std::string name {};
     std::string ref {};
+
+    void    draw_text(float x, float y, std::string const &text);
+    Vector2 measure_text(std::string const &text) const;
 
     virtual ~AbstractPackage() = default;
     virtual void layout(float x_off, float y_off) = 0;
@@ -226,6 +229,7 @@ struct DIPSwitch : public Package<S> {
 template<int S, Orientation O = Orientation::West>
 struct TriStateSwitch : public Package<S> {
     std::array<Pin *, S> pins {};
+    std::array<bool, S>  disabled {};
     Vector2              position {};
     Vector2              incr {};
     Vector2              switch_on {};
@@ -256,7 +260,7 @@ struct TriStateSwitch : public Package<S> {
             break;
         case Orientation::North:
             AbstractPackage::rect = Rectangle { PITCH * pin1.x - 4, PITCH * pin1.y - 4, PITCH * 6 + 8, PITCH * S * 2 + 8 };
-            position = { PITCH * pin1.x - 2, PITCH * pin1.y - 2 };
+            position = { PITCH * pin1.x + 2, PITCH * pin1.y + 2 };
             incr = { 0, 2 * PITCH };
             switch_on = { 4 * PITCH, 0 };
             switch_z = { 2 * PITCH, 0 };
@@ -284,19 +288,19 @@ struct TriStateSwitch : public Package<S> {
         for (auto ix = 0; ix < S; ++ix) {
             {
                 Rectangle r { p.x - 1 + switch_on.x, p.y - 1 + switch_on.y, size.x, size.y };
-                if (CheckCollisionPointRec(GetMousePosition(), r)) {
+                if (CheckCollisionPointRec(GetMousePosition(), r) && !disabled[ix]) {
                     pins[ix]->new_state = PinState::High;
                 }
             }
             {
                 Rectangle r { p.x - 1 + switch_off.x, p.y - 1 + switch_off.y, size.x, size.y };
-                if (CheckCollisionPointRec(GetMousePosition(), r)) {
+                if (CheckCollisionPointRec(GetMousePosition(), r) && !disabled[ix]) {
                     pins[ix]->new_state = PinState::Low;
                 }
             }
             {
                 Rectangle r { p.x - 1 + switch_z.x, p.y - 1 + switch_z.y, size.x, size.y };
-                if (CheckCollisionPointRec(GetMousePosition(), r)) {
+                if (CheckCollisionPointRec(GetMousePosition(), r) && !disabled[ix]) {
                     pins[ix]->new_state = PinState::Z;
                 }
             }
@@ -330,7 +334,7 @@ struct TriStateSwitch : public Package<S> {
             }
             DrawRectangleV(Vector2Add(p, offset), size, color);
             Rectangle r = { p.x - 1, p.y - 1, full_size.x, full_size.y };
-            if (CheckCollisionPointRec(GetMousePosition(), r)) {
+            if (CheckCollisionPointRec(GetMousePosition(), r) && !disabled[ix]) {
                 DrawRectangleRoundedLines(r, 0.3, 10, 1, GOLD);
             }
             p = Vector2Add(p, incr);
@@ -340,39 +344,63 @@ struct TriStateSwitch : public Package<S> {
 
 template<size_t S, Orientation O = Orientation::West>
 struct DIP : public Package<S> {
-    std::array<Pin *, S> pins {};
-    Vector2              first_row {};
-    Vector2              row_offset {};
-    Vector2              second_row {};
+    std::array<Pin *, S>   pins {};
+    std::array<Vector2, S> labels {};
+    Vector2                first_row {};
+    Vector2                row_offset {};
+    Vector2                second_row {};
 
     explicit DIP(Vector2 pin1)
         : Package<S>(pin1)
     {
+        auto width = (S < 28) ? 8.0f : 10.0f;
         switch (O) {
         case Orientation::West:
-            AbstractPackage::rect = Rectangle { PITCH * (pin1.x - 2), PITCH * (pin1.y - 6), PITCH * (S + 1), PITCH * 6 };
+            AbstractPackage::rect = Rectangle { PITCH * (pin1.x - 2), PITCH * (pin1.y - width), PITCH * (S + 1), PITCH * width };
             first_row = Vector2Scale({ 1, 0 }, PITCH);
             row_offset = Vector2Scale({ 0, -3 }, PITCH);
             second_row = Vector2Scale({ -1, 0 }, PITCH);
             break;
         case Orientation::East:
-            AbstractPackage::rect = Rectangle { PITCH * (pin1.x - (S / 2.0f)), pin1.y, PITCH * (S / 2.0f + 1), PITCH * 4 };
+            AbstractPackage::rect = Rectangle { PITCH * (pin1.x - (S / 2.0f)), pin1.y, PITCH * (S / 2.0f + 1), PITCH * width };
             first_row = Vector2Scale({ -1, 0 }, PITCH);
             row_offset = Vector2Scale({ 0, 3 }, PITCH);
             second_row = Vector2Scale({ 1, 0 }, PITCH);
             break;
         case Orientation::North:
-            AbstractPackage::rect = Rectangle { PITCH * pin1.x, PITCH * (pin1.y - 2), PITCH * 6, PITCH * (S + 1) };
+            AbstractPackage::rect = Rectangle { PITCH * pin1.x, PITCH * (pin1.y - 2), PITCH * width, PITCH * (S + 1) };
             first_row = Vector2Scale({ 0, 2 }, PITCH);
-            row_offset = Vector2Scale({ 6, 0 }, PITCH);
+            row_offset = Vector2Scale({ width, 0 }, PITCH);
             second_row = Vector2Scale({ 0, -2 }, PITCH);
             break;
         case Orientation::South:
-            AbstractPackage::rect = Rectangle { PITCH * (pin1.x - 3), PITCH * (pin1.y - (S / 2.0f)), PITCH * 3, PITCH * (S / 2.0f + 1) };
+            AbstractPackage::rect = Rectangle { PITCH * (pin1.x - 3), PITCH * (pin1.y - (S / 2.0f)), PITCH * width, PITCH * (S / 2.0f + 1) };
             first_row = Vector2Scale({ 0, -1 }, PITCH);
             row_offset = Vector2Scale({ -3, 0 }, PITCH);
             second_row = Vector2Scale({ 0, 1 }, PITCH);
             break;
+        }
+    }
+
+    void layout(float x_off, float y_off) override
+    {
+        Package<S>::layout(x_off, y_off);
+        Vector2 p { Package<S>::pin1_tx };
+        for (auto ix = 0; ix < S / 2; ++ix) {
+            if (pins[ix] && !pins[ix]->name.empty()) {
+                labels[ix] = Vector2 { p.x + PITCH, p.y - PITCH };
+            }
+            if (ix < S / 2 - 1) {
+                p = Vector2Add(p, first_row);
+            }
+        }
+        p = Vector2Add(p, row_offset);
+        for (auto ix = S / 2; ix < S; ++ix) {
+            if (pins[ix] && !pins[ix]->name.empty()) {
+                auto sz = AbstractPackage::measure_text(pins[ix]->name);
+                labels[ix] = { p.x - sz.x - PITCH, p.y - PITCH };
+            }
+            p = Vector2Add(p, second_row);
         }
     }
 
@@ -382,12 +410,18 @@ struct DIP : public Package<S> {
         Vector2 p { Package<S>::pin1_tx };
         for (auto ix = 0; ix < S / 2; ++ix) {
             DrawCircleV(p, PITCH / 2, pin_color(pins[ix]));
+            if (labels[ix].x > 0.0f) {
+                AbstractPackage::draw_text(labels[ix].x, labels[ix].y, pins[ix]->name);
+            }
             if (ix < S / 2 - 1) {
                 p = Vector2Add(p, first_row);
             }
         }
         p = Vector2Add(p, row_offset);
         for (auto ix = S / 2; ix < S; ++ix) {
+            if (labels[ix].x > 0.0f) {
+                AbstractPackage::draw_text(labels[ix].x, labels[ix].y, pins[ix]->name);
+            }
             DrawCircleV(p, PITCH / 2, pin_color(pins[ix]));
             p = Vector2Add(p, second_row);
         }
@@ -434,15 +468,17 @@ inline void connect(Pin *device, P *package)
     package->pins[0] = device;
 }
 
-struct Board {
-    struct Text {
-        int         px;
-        int         py;
-        std::string text {};
-        float       angle { 0.0 };
-        Vector2     pos { 0.0, 0.0 };
-    };
+struct Text {
+    int                                        px;
+    int                                        py;
+    std::string                                text {};
+    float                                      angle { 0.0 };
+    std::optional<std::function<void(Text *)>> on_click;
+    Vector2                                    pos { 0.0, 0.0 };
+    Vector2                                    size { 0.0, 0.0 };
+};
 
+struct Board {
     Font                                          font;
     Vector2                                       size {};
     std::vector<std::unique_ptr<AbstractPackage>> packages {};
@@ -480,7 +516,7 @@ struct Board {
             p->render();
         }
         for (auto const &text : texts) {
-            DrawTextPro(font, text.text.data(), text.pos, { 0, 0 }, text.angle, 20, 2, BLACK);
+            DrawTextPro(font, text.text.data(), text.pos, { 0, 0 }, text.angle, 15, 2, BLACK);
         }
     }
 
@@ -492,14 +528,22 @@ struct Board {
                 break;
             }
         }
+        if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+            for (auto &text : texts) {
+                if (text.on_click && CheckCollisionPointRec(GetMousePosition(), Rectangle { text.pos.x, text.pos.y, text.size.x, text.size.y })) {
+                    (*text.on_click)(&text);
+                }
+            }
+        }
     }
 
-    void add_text(int px, int py, std::string text, float angle = 0.0f)
+    void add_text(int px, int py, std::string text, float angle = 0.0f, std::optional<std::function<void(Text *)>> const &on_click = {})
     {
         auto sz = MeasureTextEx(font, text.data(), 20, 2);
         size.x = std::max(size.x, (static_cast<float>(px) + 1.0f) * PITCH + sz.x);
-        size.y = std::max(size.y, (static_cast<float>(py) + 1.0f) * PITCH);
-        texts.emplace_back(px, py, std::move(text), angle);
+        size.y = std::max(size.y, (static_cast<float>(py) + 1.0f) * PITCH + sz.y);
+        texts.emplace_back(px, py, std::move(text), angle, on_click);
+        texts.back().size = sz;
     }
 
     template<class P, typename... Args>
@@ -544,10 +588,10 @@ struct Board {
         ptr->device = device;
         connect(device, ptr);
         if (!ref.empty()) {
-            add_text(ptr->pin1.x + 2, ptr->pin1.y - 2, ref);
+            add_text(ptr->pin1.x + 3, ptr->pin1.y - 2, ref);
         }
         if (!name.empty()) {
-            add_text(ptr->pin1.x + 3, ptr->pin1.y + 1, name, 90);
+            add_text(ptr->pin1.x + 5, ptr->pin1.y + 1, name, 90);
         }
         return ptr;
     }
@@ -560,5 +604,4 @@ struct Board {
         return device;
     }
 };
-
 }

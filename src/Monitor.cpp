@@ -17,7 +17,7 @@
 namespace Simul {
 
 Monitor::Monitor(System &system)
-    : Device("Monitor")
+    : Device("Mon")
     , bus(system.bus)
 {
     U1 = add_component<LS138>();
@@ -79,21 +79,19 @@ Card make_Monitor(System &system)
     connect(monitor_circuit->GET_, signals);
     edge->add_text(1, 3, "GET_");
     signals->on_click[0] = [&system](Pin *) -> void {
-        set_pins(system.bus->GET, 0xE);
+        system.bus->data_transfer(0x0E, 0xFF);
     };
 
-    auto d_switches = edge->add_package<DIPSwitch<8, Orientation::North>>(6, 10);
+    auto d_switches = edge->add_package<DIPSwitch<8, Orientation::North>>(6, 14);
     connect(monitor_circuit->SW1, d_switches);
     for (auto bit = 0; bit < 8; ++bit) {
-        edge->add_text(3, 10 + 2 * bit, std::format("D{}", bit));
+        edge->add_text(3, 14 + 2 * bit, std::format("D{}", bit));
     }
-    auto a_switches = edge->add_package<DIPSwitch<8, Orientation::North>>(6, 28);
+    auto a_switches = edge->add_package<DIPSwitch<8, Orientation::North>>(6, 32);
     connect(monitor_circuit->SW2, a_switches);
     for (auto bit = 0; bit < 8; ++bit) {
-        edge->add_text(3, 28 + 2 * bit, std::format("A{}", bit));
+        edge->add_text(3, 32 + 2 * bit, std::format("A{}", bit));
     }
-    board->add_text(2, 80, "Mon");
-    edge->add_text(2, 80, "Mon");
     return { std::move(board), std::move(edge), monitor_circuit };
 }
 

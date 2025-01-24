@@ -23,8 +23,8 @@ namespace Simul {
 
 struct Monitor : public Device {
     ControlBus          *bus;
-    std::array<Pin *, 8> SW1;
-    std::array<Pin *, 8> SW2;
+    std::array<Pin *, 8> SW1 {};
+    std::array<Pin *, 8> SW2 {};
     LS138               *U1;
     LS245               *U3;
     LS245               *U4;
@@ -32,7 +32,7 @@ struct Monitor : public Device {
     LS08                *U7;
     Pin                 *GET_;
 
-    Monitor(System &system);
+    explicit Monitor(System &system);
 };
 
 Card make_Monitor(System &system);

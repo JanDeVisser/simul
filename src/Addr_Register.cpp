@@ -196,32 +196,22 @@ Card make_Addr_Register(System &system, int reg_no)
     edge->add_text(1, 9, "MSBGet_");
     edge->add_text(1, 11, "AGet_");
     signals->on_click[0] = [&system, reg_no](Pin *) -> void {
-        set_pins(system.bus->PUT, static_cast<uint8_t>(reg_no));
-        system.bus->XDATA_->state = PinState::Low;
-        set_pins(system.bus->OP, 0x0);
+        system.bus->data_transfer(0xFF, static_cast<uint8_t>(reg_no), 0x0);
     };
     signals->on_click[1] = [&system, reg_no](Pin *) -> void {
-        set_pins(system.bus->PUT, static_cast<uint8_t>(reg_no));
-        system.bus->XDATA_->state = PinState::Low;
-        set_pins(system.bus->OP, 0x8);
+        system.bus->data_transfer(0xFF, static_cast<uint8_t>(reg_no), 0x8);
     };
     signals->on_click[2] = [&system, reg_no](Pin *) -> void {
-        set_pins(system.bus->PUT, static_cast<uint8_t>(reg_no));
-        system.bus->XADDR_->state = PinState::Low;
+        system.bus->addr_transfer(0xFF, static_cast<uint8_t>(reg_no));
     };
     signals->on_click[3] = [&system, reg_no](Pin *) -> void {
-        set_pins(system.bus->GET, static_cast<uint8_t>(reg_no));
-        system.bus->XDATA_->state = PinState::Low;
-        set_pins(system.bus->OP, 0x0);
+        system.bus->data_transfer(static_cast<uint8_t>(reg_no), 0xFF, 0x0);
     };
     signals->on_click[4] = [&system, reg_no](Pin *) -> void {
-        set_pins(system.bus->GET, static_cast<uint8_t>(reg_no));
-        system.bus->XDATA_->state = PinState::Low;
-        set_pins(system.bus->OP, 0x8);
+        system.bus->data_transfer(static_cast<uint8_t>(reg_no), 0xFF, 0x8);
     };
     signals->on_click[5] = [&system, reg_no](Pin *) -> void {
-        set_pins(system.bus->GET, static_cast<uint8_t>(reg_no));
-        system.bus->XADDR_->state = PinState::Low;
+        system.bus->addr_transfer(static_cast<uint8_t>(reg_no), 0xFF);
     };
 
     auto tx_dbus = edge->add_package<LEDArray<8, Orientation::North>>(10, 14);
@@ -234,8 +224,6 @@ Card make_Addr_Register(System &system, int reg_no)
     for (auto bit = 0; bit < 8; ++bit) {
         edge->add_text(5, 32 + 2 * bit, std::format("AQ{}", bit));
     }
-    board->add_text(2, 80, reg_circuit->name);
-    edge->add_text(2, 80, reg_circuit->name);
     return { std::move(board), std::move(edge), reg_circuit };
 }
 
