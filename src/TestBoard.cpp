@@ -19,6 +19,7 @@
 #include "IC/LS193.h"
 #include "IC/LS245.h"
 #include "IC/LS377.h"
+#include "IC/LS382.h"
 
 namespace Simul {
 
@@ -358,6 +359,10 @@ void main(int argc, char **argv)
                 LS377_test(board);
             } else if (device == "LS377_Latch") {
                 LS377_latch_test(board);
+            } else if (device == "LS382_decoder") {
+                LS382_decoder_test(board);
+            } else if (device == "LS382") {
+                LS382_test(board);
             } else if (device == "TFlipFlop") {
                 test_board<TFlipFlop>(board);
             } else if (device == "SRAM") {

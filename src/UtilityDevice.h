@@ -53,4 +53,26 @@ void connect(std::array<TieDown *, S> device, P *package)
     }
 }
 
+template<size_t N, Orientation O = Orientation::North>
+inline DIPSwitch<N, O> *switches(Board &board, size_t x, size_t y, std::array<Pin *, N> pins)
+{
+    std::array<TieDown *, N> tiedowns;
+    for (auto ix = 0; ix < N; ++ix) {
+        tiedowns[ix] = board.circuit.add_component<TieDown>();
+        pins[ix]->feed = tiedowns[ix]->Y;
+    }
+    auto ret = board.add_package<DIPSwitch<N, O>>(x, y);
+    connect(tiedowns, ret);
+    return ret;
+}
+
+template<size_t N, Orientation O = Orientation::North>
+inline LEDArray<N, O> *leds(Board &board, size_t x, size_t y, std::array<Pin *, N> pins)
+{
+    std::array<TieDown *, N> tiedowns;
+    auto                     ret = board.add_package<LEDArray<N, O>>(x, y);
+    connect(pins, ret);
+    return ret;
+}
+
 }

@@ -45,7 +45,9 @@ add_library(
         src/IC/LS193.cpp
         src/IC/LS245.cpp
         src/IC/LS377.cpp
+        src/IC/LS382.cpp
         src/IC/LS574.cpp
+        src/IC/LS382.cpp
 )
 
 target_link_libraries(
@@ -79,6 +81,7 @@ target_link_libraries(
 add_executable(
         ChipTester
         src/ChipTester/ChipTester.cpp
+        src/IC/LS382.cpp
 )
 
 target_link_libraries(

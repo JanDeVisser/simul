@@ -604,4 +604,5 @@ struct Board {
         return device;
     }
 };
+
 }

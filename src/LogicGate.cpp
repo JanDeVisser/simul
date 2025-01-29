@@ -8,7 +8,6 @@
 #include "UtilityDevice.h"
 
 namespace Simul {
-
 Inverter::Inverter(std::string const &ref)
     : Device("Inverter", ref)
 {
@@ -55,6 +54,9 @@ LogicGate::LogicGate(std::string const &name, int inputs, std::string const &ref
     assert(inputs > 1);
     A1 = add_pin(1, "A1");
     simulate_device = [this](Device *, duration d) -> void {
+        if (pins.size() == 1) {
+            Y->new_state = finalize(A1->new_state);
+        }
         auto s = operate(A1->new_state, A2->new_state);
         for (auto ix = 2; ix < pins.size() - 1; ++ix) {
             s = operate(s, pins[ix]->new_state);
@@ -169,13 +171,28 @@ NorIcon::NorIcon(Vector2 pos)
 }
 
 XorGate::XorGate(std::string const &ref)
-    : LogicGate("XOR", 2, ref)
+    : XorGate("XOR", ref)
+{
+}
+
+XorGate::XorGate(std::string const &name, std::string const &ref)
+    : LogicGate(name, 2, ref)
 {
 }
 
 PinState XorGate::operate(PinState s1, PinState s2)
 {
     return s1 ^ s2;
+}
+
+XNorGate::XNorGate(std::string const &ref)
+    : XorGate("XNOR", ref)
+{
+}
+
+PinState XNorGate::finalize(PinState s)
+{
+    return !s;
 }
 
 XorIcon::XorIcon(Vector2 pos)

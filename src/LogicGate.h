@@ -32,9 +32,9 @@ inline void connect(Inverter *device, InverterIcon *package)
 }
 
 struct LogicGate : public Device {
-    Pin *A1;
-    Pin *A2;
-    Pin *Y;
+    Pin *A1 { nullptr };
+    Pin *A2 { nullptr };
+    Pin *Y { nullptr };
 
     explicit LogicGate(std::string const &name, int inputs = 2, std::string const &ref = "");
     virtual PinState operate(PinState s1, PinState s2) = 0;
@@ -105,7 +105,13 @@ struct NorIcon : public OrIcon {
 
 struct XorGate : public LogicGate {
     explicit XorGate(std::string const &ref = "");
+    explicit XorGate(std::string const &name, std::string const &ref = "");
     PinState operate(PinState s1, PinState s2) override;
+};
+
+struct XNorGate : public XorGate {
+    explicit XNorGate(std::string const &ref = "");
+    PinState finalize(PinState s) override;
 };
 
 struct XorIcon : LogicIcon {
