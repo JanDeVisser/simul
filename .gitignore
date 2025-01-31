@@ -4,4 +4,7 @@
 .zed/
 build
 cmake-build-debug/
-
+**/*.zip
+**/*.lck
+**/?auto_saved_files?
+**/_autosave-*
