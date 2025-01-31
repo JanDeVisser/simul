@@ -12,16 +12,16 @@ include_directories(src ${raylib_INCLUDE_DIRS} ${FREETYPE_INCLUDE_DIRS})
 add_library(
         Circuit
         STATIC
-        src/Circuit.cpp
-        src/Device.cpp
-        src/Graphics.cpp
-        src/Latch.cpp
-        src/LogicGate.cpp
-        src/Memory.cpp
-        src/Oscillator.cpp
-        src/Pin.cpp
-        src/PushButton.h
-        src/UtilityDevice.cpp
+        src/Circuit/Circuit.cpp
+        src/Circuit/Device.cpp
+        src/Circuit/Graphics.cpp
+        src/Circuit/Latch.cpp
+        src/Circuit/LogicGate.cpp
+        src/Circuit/Memory.cpp
+        src/Circuit/Oscillator.cpp
+        src/Circuit/Pin.cpp
+        src/Circuit/PushButton.h
+        src/Circuit/UtilityDevice.cpp
 )
 
 target_link_libraries(
@@ -62,14 +62,14 @@ target_link_libraries(
 
 add_executable(
         simul
-        src/Simul.cpp
-        src/Addr_Register.cpp
-        src/ALU.cpp
-        src/ControlBus.cpp
-        src/GP_Register.cpp
-        src/Monitor.cpp
-        src/System.cpp
-        src/Mem_Register.cpp
+        src/App/Simul.cpp
+        src/App/Addr_Register.cpp
+        src/App/ALU.cpp
+        src/App/ControlBus.cpp
+        src/App/GP_Register.cpp
+        src/App/Monitor.cpp
+        src/App/System.cpp
+        src/App/Mem_Register.cpp
 )
 
 target_link_libraries(
@@ -98,7 +98,7 @@ target_link_libraries(
 
 add_executable(
         TestBoard
-        src/TestBoard.cpp
+        src/TestBoard/TestBoard.cpp
 )
 
 target_link_libraries(

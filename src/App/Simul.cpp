@@ -9,7 +9,7 @@
 
 #include <raylib.h>
 
-#include "Graphics.h"
+#include "Circuit/Graphics.h"
 #include "System.h"
 
 namespace Simul {

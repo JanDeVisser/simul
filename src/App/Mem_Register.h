@@ -7,9 +7,9 @@
 #pragma once
 
 #include "ControlBus.h"
-#include "Device.h"
-#include "Graphics.h"
-#include "Memory.h"
+#include "Circuit/Device.h"
+#include "Circuit/Graphics.h"
+#include "Circuit/Memory.h"
 #include "System.h"
 
 #include "IC/LS04.h"

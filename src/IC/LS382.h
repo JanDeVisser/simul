@@ -8,10 +8,10 @@
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "bugprone-reserved-identifier"
 
-#include "Device.h"
-#include "Graphics.h"
-#include "LogicGate.h"
-#include "Pin.h"
+#include "Circuit/Device.h"
+#include "Circuit/Graphics.h"
+#include "Circuit/LogicGate.h"
+#include "Circuit/Pin.h"
 
 namespace Simul {
 struct LS382 : public Device {

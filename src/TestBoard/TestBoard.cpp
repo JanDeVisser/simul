@@ -9,11 +9,11 @@
 
 #include <raylib.h>
 
-#include "Graphics.h"
-#include "Latch.h"
-#include "Memory.h"
-#include "Oscillator.h"
-#include "UtilityDevice.h"
+#include "Circuit/Graphics.h"
+#include "Circuit/Latch.h"
+#include "Circuit/Memory.h"
+#include "Circuit/Oscillator.h"
+#include "Circuit/UtilityDevice.h"
 
 #include "IC/LS157.h"
 #include "IC/LS193.h"

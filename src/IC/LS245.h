@@ -8,11 +8,11 @@
 
 #include <array>
 
-#include "Device.h"
-#include "Graphics.h"
-#include "Latch.h"
-#include "LogicGate.h"
-#include "Pin.h"
+#include "Circuit/Device.h"
+#include "Circuit/Graphics.h"
+#include "Circuit/Latch.h"
+#include "Circuit/LogicGate.h"
+#include "Circuit/Pin.h"
 
 namespace Simul {
 

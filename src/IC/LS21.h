@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "Graphics.h"
-#include "LogicGate.h"
+#include "Circuit/Graphics.h"
+#include "Circuit/LogicGate.h"
 
 namespace Simul {
 

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Graphics.h"
+#include "Circuit/Graphics.h"
 
 namespace Simul {
 

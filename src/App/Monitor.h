@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include "Circuit.h"
+#include "Circuit/Circuit.h"
+#include "Circuit/Graphics.h"
+#include "Circuit/UtilityDevice.h"
 #include "ControlBus.h"
 #include "GP_Register.h"
-#include "Graphics.h"
 #include "IC/LS04.h"
 #include "IC/LS08.h"
 #include "IC/LS138.h"
@@ -17,7 +18,6 @@
 #include "IC/LS32.h"
 #include "IC/LS377.h"
 #include "System.h"
-#include "UtilityDevice.h"
 
 namespace Simul {
 

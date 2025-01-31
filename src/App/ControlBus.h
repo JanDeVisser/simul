@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include "Device.h"
-#include "Graphics.h"
-#include "Pin.h"
+#include "Circuit/Device.h"
+#include "Circuit/Graphics.h"
+#include "Circuit/Pin.h"
 #include "System.h"
-#include "UtilityDevice.h"
+#include "Circuit/UtilityDevice.h"
 
 namespace Simul {
 

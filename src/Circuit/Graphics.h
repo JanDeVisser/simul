@@ -12,9 +12,9 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include <Circuit.h>
-#include <Device.h>
-#include <Pin.h>
+#include "Circuit.h"
+#include "Device.h"
+#include "Pin.h"
 
 namespace Simul {
 

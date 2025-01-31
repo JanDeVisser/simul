@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "Graphics.h"
-#include "LogicGate.h"
+#include "Circuit/Graphics.h"
+#include "Circuit/LogicGate.h"
 
 namespace Simul {
 
@@ -19,7 +19,7 @@ struct LS00 : public Device {
     LS00();
 };
 
-void LS00_test(Board&);
+void LS00_test(Board &);
 
 template<Orientation O>
 inline void connect(LS00 *device, DIP<14, O> *package)

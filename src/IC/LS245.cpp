@@ -6,11 +6,11 @@
 
 #include <raylib.h>
 
-#include "Circuit.h"
-#include "Graphics.h"
+#include "Circuit/Circuit.h"
+#include "Circuit/Graphics.h"
 #include "LS245.h"
-#include "LogicGate.h"
-#include "UtilityDevice.h"
+#include "Circuit/LogicGate.h"
+#include "Circuit/UtilityDevice.h"
 
 namespace Simul {
 

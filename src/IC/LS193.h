@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "Circuit.h"
-#include "Device.h"
-#include "Latch.h"
+#include "Circuit/Circuit.h"
+#include "Circuit/Device.h"
+#include "Circuit/Latch.h"
 
 namespace Simul {
 

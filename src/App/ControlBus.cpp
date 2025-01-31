@@ -5,9 +5,9 @@
  */
 
 #include "ControlBus.h"
-#include "Graphics.h"
-#include "Oscillator.h"
-#include "PushButton.h"
+#include "Circuit/Graphics.h"
+#include "Circuit/Oscillator.h"
+#include "Circuit/PushButton.h"
 
 namespace Simul {
 

@@ -9,7 +9,7 @@
 #include "Addr_Register.h"
 #include "ControlBus.h"
 #include "GP_Register.h"
-#include "Graphics.h"
+#include "Circuit/Graphics.h"
 #include "Mem_Register.h"
 #include "Monitor.h"
 

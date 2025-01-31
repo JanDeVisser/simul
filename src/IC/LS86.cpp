@@ -5,7 +5,7 @@
  */
 
 #include "LS86.h"
-#include "UtilityDevice.h"
+#include "Circuit/UtilityDevice.h"
 
 namespace Simul {
 

@@ -5,8 +5,8 @@
  */
 
 #include "LS193.h"
-#include "Latch.h"
-#include "LogicGate.h"
+#include "Circuit/Latch.h"
+#include "Circuit/LogicGate.h"
 
 namespace Simul {
 

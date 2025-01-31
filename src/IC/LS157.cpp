@@ -5,7 +5,7 @@
  */
 
 #include "IC/LS157.h"
-#include "UtilityDevice.h"
+#include "Circuit/UtilityDevice.h"
 
 namespace Simul {
 

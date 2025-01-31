@@ -13928,6 +13928,16 @@
 		)
 		(uuid "16e6bf5c-9839-4fb6-88e0-989665048a38")
 	)
+	(label "~{LHS}"
+		(at 95.25 77.47 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "18f6b8d6-8964-4416-92d9-444a0c9e663a")
+	)
 	(label "CFlag"
 		(at 298.45 128.27 0)
 		(effects

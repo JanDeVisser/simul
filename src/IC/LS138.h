@@ -8,9 +8,9 @@
 
 #include <array>
 
-#include "Device.h"
-#include "Graphics.h"
-#include "Pin.h"
+#include "Circuit/Device.h"
+#include "Circuit/Graphics.h"
+#include "Circuit/Pin.h"
 
 namespace Simul {
 
