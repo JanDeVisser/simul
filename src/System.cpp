@@ -5,6 +5,7 @@
  */
 
 #include "System.h"
+#include "ALU.h"
 #include "Addr_Register.h"
 #include "ControlBus.h"
 #include "GP_Register.h"
@@ -29,6 +30,7 @@ System::System(Font font)
     cards.emplace_back(std::move(make_Addr_Register(*this, 11)));
     cards.emplace_back(std::move(make_Addr_Register(*this, 12)));
     cards.emplace_back(std::move(make_Mem_Register(*this)));
+    cards.emplace_back(std::move(make_ALU(*this)));
     cards.emplace_back(std::move(make_Monitor(*this)));
 
     for (auto ix = 0; ix < cards.size(); ++ix) {

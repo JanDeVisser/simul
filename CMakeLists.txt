@@ -35,8 +35,10 @@ add_library(
         LS
         STATIC
         src/IC/LS00.cpp
+        src/IC/LS02.cpp
         src/IC/LS04.cpp
         src/IC/LS08.cpp
+        src/IC/LS21.cpp
         src/IC/LS32.cpp
         src/IC/LS86.cpp
         src/IC/LS138.cpp
@@ -62,6 +64,7 @@ add_executable(
         simul
         src/Simul.cpp
         src/Addr_Register.cpp
+        src/ALU.cpp
         src/ControlBus.cpp
         src/GP_Register.cpp
         src/Monitor.cpp
@@ -78,20 +81,20 @@ target_link_libraries(
         m
 )
 
-add_executable(
-        ChipTester
-        src/ChipTester/ChipTester.cpp
-        src/IC/LS382.cpp
-)
-
-target_link_libraries(
-        ChipTester
-        Circuit
-        LS
-        ${raylib_LIBRARIES}
-        ${FREETYPE_LIBRARIES}
-        m
-)
+#add_executable(
+#        ChipTester
+#        src/ChipTester/ChipTester.cpp
+#        src/IC/LS382.cpp
+#)
+#
+#target_link_libraries(
+#        ChipTester
+#        Circuit
+#        LS
+#        ${raylib_LIBRARIES}
+#        ${FREETYPE_LIBRARIES}
+#        m
+#)
 
 add_executable(
         TestBoard

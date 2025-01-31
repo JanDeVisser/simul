@@ -12,7 +12,8 @@
 namespace Simul {
 
 struct PushButton : public Package<1> {
-    Vector2 size { 4 * PITCH, 4 * PITCH };
+    Vector2                                   size { 4 * PITCH, 4 * PITCH };
+    std::optional<std::function<void(Pin *)>> on_click {};
 
     explicit PushButton(Vector2 pin1)
         : Package<1>(pin1)
@@ -26,7 +27,11 @@ struct PushButton : public Package<1> {
             return;
         }
         if (CheckCollisionPointRec(GetMousePosition(), rect)) {
-            pins[0]->flip();
+            if (on_click) {
+                (*on_click)(pins[0]);
+            } else {
+                pins[0]->flip();
+            }
         }
     }
 

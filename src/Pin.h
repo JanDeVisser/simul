@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <functional>
 #include <iostream>
 #include <sstream>
