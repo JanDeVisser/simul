@@ -4,10 +4,11 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "ControlBus.h"
-#include "Circuit/Graphics.h"
-#include "Circuit/Oscillator.h"
-#include "Circuit/PushButton.h"
+#include <App/ControlBus.h>
+#include <App/Monitor.h>
+#include <Circuit/Graphics.h>
+#include <Circuit/Oscillator.h>
+#include <Circuit/PushButton.h>
 
 namespace Simul {
 
@@ -15,6 +16,7 @@ ControlBus::ControlBus()
     : Device("BUS")
 {
     clock_switch = add_component<Switch<200>>();
+    oscillator = add_component<Oscillator>(1);
     for (auto pin = 0; pin < 40; ++pin) {
         tiedowns[pin] = add_component<TieDown>(PinState::Low);
     }
@@ -112,6 +114,16 @@ void ControlBus::addr_transfer(uint8_t from, uint8_t to, uint8_t op) const
         set_pins(PUT, to & 0x0F);
     }
     set_pins(OP, op & 0x0F);
+}
+
+void ControlBus::enable_oscillator()
+{
+    CLK->feed = oscillator->Y;
+}
+
+void ControlBus::disable_oscillator()
+{
+    CLK->feed = clock_switch->Y;
 }
 
 void bus_label(Board &board, int op, std::string const &label)

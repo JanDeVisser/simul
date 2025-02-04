@@ -12,9 +12,13 @@
 namespace Simul {
 
 struct Oscillator : public Device {
-    duration period;
-    duration last_pulse {};
-    Pin     *Y;
+    using OscillatorCallback = std::function<void(Oscillator *)>;
+
+    duration                          period;
+    duration                          last_pulse {};
+    Pin                              *Y;
+    std::optional<OscillatorCallback> on_high;
+    std::optional<OscillatorCallback> on_low;
 
     explicit Oscillator(int frequency);
 };

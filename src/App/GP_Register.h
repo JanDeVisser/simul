@@ -6,42 +6,42 @@
 
 #pragma once
 
-#include "ControlBus.h"
-#include "GP_Register.h"
-#include "Circuit/Circuit.h"
-#include "Circuit/Graphics.h"
-#include "IC/LS04.h"
-#include "IC/LS08.h"
-#include "IC/LS138.h"
-#include "IC/LS245.h"
-#include "IC/LS32.h"
-#include "IC/LS377.h"
-#include "System.h"
-#include "Circuit/UtilityDevice.h"
+#include <App/ControlBus.h>
+#include <App/GP_Register.h>
+#include <App/System.h>
+#include <Circuit/Circuit.h>
+#include <Circuit/Graphics.h>
+#include <Circuit/UtilityDevice.h>
+#include <IC/LS04.h>
+#include <IC/LS08.h>
+#include <IC/LS138.h>
+#include <IC/LS245.h>
+#include <IC/LS32.h>
+#include <IC/LS377.h>
 
 namespace Simul {
 
 struct GP_Register : public Device {
-    int reg_no {0};
+    int         reg_no { 0 };
     ControlBus *bus;
-    LS138 *U1;
-    LS138 *U2;
-    LS245 *U3;
-    LS377 *U4;
-    LS04 *U5;
-    LS32 *U6;
-    LS08 *U7;
-    LS32 *U8;
-    Pin *PUT_;
-    Pin *GET_;
-    Pin *IOIn;
-    Pin *IOOut;
-    Pin *In_;
-    Pin *Out_;
+    LS138      *U1;
+    LS138      *U2;
+    LS245      *U3;
+    LS377      *U4;
+    LS04       *U5;
+    LS32       *U6;
+    LS08       *U7;
+    LS32       *U8;
+    Pin        *PUT_;
+    Pin        *GET_;
+    Pin        *IOIn;
+    Pin        *IOOut;
+    Pin        *In_;
+    Pin        *Out_;
 
     GP_Register(System &system, int reg_no);
 };
 
-Card make_GP_Register(System &system, int reg_no);
+struct Card make_GP_Register(System &system, int reg_no);
 
 }

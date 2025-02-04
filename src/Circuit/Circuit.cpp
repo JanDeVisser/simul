@@ -79,8 +79,8 @@ size_t Circuit::simulate(duration d)
         }
     };
     recurse_components(this, [d](Device *dev) {
-        if (dev->simulate_device) {
-            (*dev->simulate_device)(dev, d);
+        if (dev->simulate_device.has_value()) {
+            (dev->simulate_device.value())(dev, d);
         }
     });
     for (auto ix = 0; ix < pin_count; ++ix) {

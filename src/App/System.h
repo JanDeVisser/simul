@@ -6,7 +6,11 @@
 
 #pragma once
 
-#include "Circuit/Graphics.h"
+#include <App/MicroCode.h>
+#include <App/Monitor.h>
+#include <Circuit/Graphics.h>
+#include <Circuit/Memory.h>
+#include <Circuit/Oscillator.h>
 
 namespace Simul {
 
@@ -17,16 +21,22 @@ struct Card {
 };
 
 struct System {
-    Circuit               &circuit;
-    struct ControlBus     *bus;
-    std::optional<int>     current_card {};
-    std::unique_ptr<Board> backplane;
-    std::vector<Card>      cards;
-    Font                   font;
-    Vector2                size {};
+    Circuit                   &circuit;
+    struct ControlBus         *bus;
+    std::optional<int>         current_card {};
+    std::unique_ptr<Board>     backplane;
+    std::vector<Card>          cards;
+    Font                       font;
+    Vector2                    size {};
+    std::vector<MicroCodeStep> microcode {};
+    size_t                     current_step { 0 };
+    EEPROM_28C256             *rom;
+    SRAM_LY62256              *ram;
+    struct Monitor            *monitor;
 
     explicit System(Font font);
     std::unique_ptr<Board> make_board();
+    std::thread            simulate();
     void                   layout();
     void                   handle_input();
     void                   render();

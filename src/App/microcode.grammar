@@ -1,0 +1,98 @@
+std::string_view microcode_grammar = R"(
+//
+// Copyright (c) 2025, Jan de Visser <jan@finiandarcy.com>
+//
+// SPDX-License-Identifier: MIT
+//
+
+%
+  lexer:       "whitespace: ignore_ws=true;ignore_nl=false"
+  lexer:       keyword
+  lexer:       identifier
+  lexer:       "number: signed=false;float=false;hex=true;binary=true"
+  lexer:       "qstring: quotes=\'\"`"
+  lexer:       "comment: ignore=true;marker=/* */;marker=//"
+%
+
+program                     := step steps
+                             ;
+
+steps                       := #nl
+                               step
+                               steps
+                             |
+                             ;
+
+step                        := data_copy
+                             | addr_copy
+                             | mem_set
+                             | monitor
+                             ;
+
+data_copy                   := "D"               [ set_action                ]
+                               get               [ set_get_reg               ]
+                               put               [ set_put_reg               ]
+                               op                [ set_op_bits               ]
+                             ;
+
+addr_copy                   := "A"               [ set_action                ]
+                               get               [ set_get_reg               ]
+                               put               [ set_put_reg               ]
+                               op                [ set_op_bits               ]
+                             ;
+
+get                         := register
+                             ;
+
+put                         := register
+                             ;
+
+op                          := bits
+                             ;
+
+register                    := "A" | "B" | "C" | "D"
+                             | "LHS" | "RHS"
+                             | "IR"
+                             | "Mem"
+                             | "PC"
+                             | "SP"
+                             | "Si"
+                             | "Di"
+                             | "TX"
+                             | "Mon"
+                             | "MemAddr"
+                             | "Res"
+                             | "Flags"
+                             | bits
+                             ;
+
+bits                        := #int
+                             | #hex
+                             | #binary
+                             ;
+
+mem_set                     := "M"               [ set_action                ]
+                               bits              [ set_address               ]
+                               values
+                             ;
+
+values                      := '{'
+                               value
+                               more_values
+                               '}'
+                             ;
+
+more_values                 := value
+                               more_values
+                             |
+                             ;
+
+value                       := bits              [ append_value              ]
+                             ;
+
+monitor                     := "S"               [ set_action                ]
+                               bits              [ set_d_value               ]
+                               bits              [ set_a_value               ]
+                             ;
+
+)";

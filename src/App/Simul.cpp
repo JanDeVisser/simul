@@ -10,18 +10,27 @@
 #include <raylib.h>
 
 #include "Circuit/Graphics.h"
+#include "MicroCode.h"
 #include "System.h"
 
 namespace Simul {
 
-void main()
+void main(int argc, char **argv)
 {
     InitWindow(30 * static_cast<int>(PITCH), 30 * static_cast<int>(PITCH), "Simul");
     SetWindowState(FLAG_VSYNC_HINT);
     {
         auto   font = LoadFontEx("fonts/Tecnico-Bold.ttf", 15, nullptr, 0);
         System system(font);
-        auto   t = system.circuit.start_simulation();
+        if (argc > 1) {
+            if (auto mc_maybe = parse_microcode(argv[1]); mc_maybe.is_error()) {
+                std::cerr << mc_maybe.error() << "\n";
+                exit(1);
+            } else {
+                std::swap(mc_maybe.value(), system.microcode);
+            }
+        }
+        auto t = system.simulate();
         SetTargetFPS(60);
         {
             SetWindowSize(static_cast<int>(system.size.x), static_cast<int>(system.size.y));
@@ -41,8 +50,8 @@ void main()
 
 }
 
-int main()
+int main(int argc, char **argv)
 {
-    Simul::main();
+    Simul::main(argc, argv);
     return 0;
 }

@@ -18,6 +18,12 @@ Oscillator::Oscillator(int frequency)
         if (d - last_pulse > period) {
             Y->new_state = !Y->new_state;
             last_pulse = d;
+            if (Y->new_state == PinState::Low && on_low.has_value()) {
+                (on_low.value())(this);
+            }
+            if (Y->new_state == PinState::High && on_high.has_value()) {
+                (on_high.value())(this);
+            }
         }
     };
 }

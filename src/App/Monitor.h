@@ -10,7 +10,6 @@
 #include "Circuit/Graphics.h"
 #include "Circuit/UtilityDevice.h"
 #include "ControlBus.h"
-#include "GP_Register.h"
 #include "IC/LS04.h"
 #include "IC/LS08.h"
 #include "IC/LS138.h"
@@ -35,6 +34,6 @@ struct Monitor : public Device {
     explicit Monitor(System &system);
 };
 
-Card make_Monitor(System &system);
+struct Card make_Monitor(System &system);
 
 }
