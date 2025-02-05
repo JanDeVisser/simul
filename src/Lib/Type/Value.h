@@ -231,7 +231,9 @@ public:
                     return static_cast<IntType>(v);
                 },
                 [](std::floating_point auto fp) {
-                    if (fp > std::numeric_limits<IntType>::max() || fp < std::numeric_limits<IntType>::min()) {
+                    using Flt = decltype(fp);
+                    if (fp > static_cast<Flt>(std::numeric_limits<IntType>::max()) ||
+                        fp < static_cast<Flt>(std::numeric_limits<IntType>::min())) {
                         fatal("Floating point value {} cannot be converted to {}", fp, typeid(IntType).name());
                     }
                     return static_cast<IntType>(fp);
@@ -259,7 +261,8 @@ public:
                     return static_cast<IntType>(v);
                 },
                 [](std::floating_point auto fp) {
-                    if (fp > std::numeric_limits<IntType>::max() || fp < 0.0) {
+                    using Flt = decltype(fp);
+                    if (fp > static_cast<Flt>(std::numeric_limits<IntType>::max() || fp < 0.0)) {
                         fatal("Floating point value {} cannot be converted to {}", fp, typeid(IntType).name());
                     }
                     return static_cast<IntType>(fp);

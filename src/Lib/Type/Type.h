@@ -35,8 +35,6 @@ using f64 = double;
 
 namespace Lib {
 
-using TypeReference = size_t;
-
 #define PrimitiveTypes(S)         \
     S(Void, void, std::monostate) \
     S(I8, i8, i8)                 \
@@ -96,7 +94,7 @@ using TypeReference = size_t;
     BasicTypes(S)       \
         S(Int, int, int)
 
-enum class PrimitiveType : TypeReference {
+enum class PrimitiveType : size_t {
 #undef S
 #define S(T, L, ...) T = __COUNTER__,
     PrimitiveTypes(S)
@@ -105,31 +103,38 @@ enum class PrimitiveType : TypeReference {
 
 #define STRING __COUNTER__
 
-enum class PseudoType : TypeReference {
+enum class PseudoType : size_t {
 #undef S
 #define S(T, L, ...) T = __COUNTER__,
     PseudoTypes(S)
 #undef S
 };
 
-enum class BasicType : TypeReference {
+enum class BasicType : size_t {
 #undef S
 #define S(T, L, ...) T,
     BasicTypes(S)
 #undef S
 };
 
-enum class BuiltinType : TypeReference {
+enum class BuiltinType : size_t {
 #undef S
 #define S(T, L, ...) T,
     BuiltinTypes(S)
 #undef S
 };
 
+enum  TypeReference : size_t {
 #undef S
-#define S(T, L, ...) constexpr static TypeReference T##Type = static_cast<TypeReference>(BuiltinType::T);
-BuiltinTypes(S)
+#define S(T, L, ...) T##Type,
+    BuiltinTypes(S)
 #undef S
+};
+
+// #undef S
+// #define S(T, L, ...) constexpr static TypeReference T##Type = static_cast<TypeReference>(BuiltinType::T);
+// BuiltinTypes(S)
+// #undef S
 
     template<typename T>
     constexpr inline TypeReference type_of()

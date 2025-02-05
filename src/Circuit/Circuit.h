@@ -7,9 +7,10 @@
 #pragma once
 
 #include <concepts>
+#include <condition_variable>
 #include <thread>
 
-#include "Device.h"
+#include <Circuit/Device.h>
 
 namespace Simul {
 

@@ -12,9 +12,10 @@
 #include <raylib.h>
 #include <raymath.h>
 
-#include "Circuit.h"
-#include "Device.h"
-#include "Pin.h"
+#include <Circuit/Circuit.h>
+#include <Circuit/Device.h>
+#include <Circuit/Pin.h>
+#include <Lib/Logging.h>
 
 namespace Simul {
 
@@ -80,6 +81,8 @@ inline Color pin_color(Pin *pin)
         return DARKPURPLE;
     case PinState::High:
         return RED;
+    default:
+        UNREACHABLE();
     }
 }
 
@@ -219,7 +222,7 @@ struct DIPSwitch : public Package<S> {
             DrawRectangleV(Vector2Add(p, (pins[ix] && pins[ix]->on()) ? switch_on : switch_off), size, color);
             Rectangle r = { p.x - 1, p.y - 1, double_size.x, double_size.y };
             if (CheckCollisionPointRec(GetMousePosition(), r)) {
-                DrawRectangleRoundedLines(r, 0.3, 10, 1, GOLD);
+                DrawRectangleRoundedLines(r, 0.3, 10, GOLD);
             }
             p = Vector2Add(p, incr);
         }
@@ -335,7 +338,7 @@ struct TriStateSwitch : public Package<S> {
             DrawRectangleV(Vector2Add(p, offset), size, color);
             Rectangle r = { p.x - 1, p.y - 1, full_size.x, full_size.y };
             if (CheckCollisionPointRec(GetMousePosition(), r) && !disabled[ix]) {
-                DrawRectangleRoundedLines(r, 0.3, 10, 1, GOLD);
+                DrawRectangleRoundedLines(r, 0.3, 10, GOLD);
             }
             p = Vector2Add(p, incr);
         }
@@ -406,7 +409,7 @@ struct DIP : public Package<S> {
 
     void render() override
     {
-        DrawRectangleRoundedLines(AbstractPackage::rect, 0.3f, 10, 3, BLACK);
+        DrawRectangleRoundedLines(AbstractPackage::rect, 0.3f, 10, BLACK);
         Vector2 p { Package<S>::pin1_tx };
         for (auto ix = 0; ix < S / 2; ++ix) {
             DrawCircleV(p, PITCH / 2, pin_color(pins[ix]));
@@ -511,7 +514,7 @@ struct Board {
     {
         ClearBackground(DARKGREEN);
         auto outline = Rectangle { rect.x - PITCH * 0.25f, rect.y - PITCH * 0.25f, rect.width + PITCH * 0.5f, rect.height + PITCH * 0.5f };
-        DrawRectangleRoundedLines(outline, 0.2, 10, 2, GRAY);
+        DrawRectangleRoundedLines(outline, 0.2, 10, GRAY);
         for (auto const &p : packages) {
             p->render();
         }

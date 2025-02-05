@@ -321,7 +321,7 @@ TypeRegistry::TypeRegistry()
 
 TypeReference TypeRegistry::register_type(Type t)
 {
-    t.ref = types.size();
+    t.ref = static_cast<TypeReference>(types.size());
     index.emplace(t.name, t.ref);
     types.emplace_back(std::move(t));
     auto const &tt = types.back();

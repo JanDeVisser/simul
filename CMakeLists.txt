@@ -100,7 +100,7 @@ add_executable(
         src/App/ALU.cpp
         src/App/ControlBus.cpp
         src/App/GP_Register.cpp
-        src/app/MicroCode.cpp
+        src/App/MicroCode.cpp
         src/App/Monitor.cpp
         src/App/System.cpp
         src/App/Mem_Register.cpp

@@ -136,7 +136,7 @@ void System::render()
         auto  outline = Rectangle { rect.x - PITCH * 0.5f, rect.y - PITCH * 0.5f, rect.width + PITCH, rect.height + PITCH };
         DrawRectangleRounded(outline, 0.2, 10, DARKGREEN);
         outline = Rectangle { rect.x - PITCH * 0.25f, rect.y - PITCH * 0.25f, rect.width + PITCH * 0.5f, rect.height + PITCH * 0.5f };
-        DrawRectangleRoundedLines(outline, 0.2, 10, 2, DARKGREEN);
+        DrawRectangleRoundedLines(outline, 0.2, 10, DARKGREEN);
         card.board->render();
     }
 }

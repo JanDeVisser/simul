@@ -45,7 +45,7 @@ struct PushButton : public Package<1> {
         r.width -= 4;
         r.height -= 4;
         if (CheckCollisionPointRec(GetMousePosition(), r)) {
-            DrawRectangleRoundedLines(r, 0.3, 10, 1, GOLD);
+            DrawRectangleRoundedLines(r, 0.3, 10, GOLD);
         }
         r.x += 2;
         r.y += 2;

@@ -102,36 +102,39 @@ size_t Circuit::simulate(duration d)
 std::thread Circuit::start_simulation()
 {
     std::unique_lock lock(yield_mutex);
-    std::thread      t { [&]() {
+
+    std::println(std::cout, "1");
+    for (auto ix = 0; ix < pin_count; ++ix) {
+        Pin &p = all_pins[ix];
+        if (p.on_update) {
+            (*p.on_update)(&p, 0ms);
+        }
+        if (p.on_change) {
+            (*p.on_change)(&p, 0ms);
+        }
+    }
+    recurse_components(this, [](Device *dev) {
+        if (dev->simulate_device) {
+            (*dev->simulate_device)(dev, 0ms);
+        }
+    });
+    std::println(std::cout, "2");
+    for (auto ix = 0; ix < pin_count; ++ix) {
+        all_pins[ix].new_state = all_pins[ix].state;
+        all_pins[ix].new_driving = all_pins[ix].driving;
+    }
+    std::println(std::cout, "3");
+
+    std::thread t { [&]() {
         if (status != SimStatus::Unstarted && status != SimStatus::Done) {
             return;
         }
-        auto         start = std::chrono::high_resolution_clock::now();
+        auto    start = std::chrono::high_resolution_clock::now();
         status = SimStatus::Starting;
         do {
             {
                 std::unique_lock lock(yield_mutex);
-                if (status == SimStatus::Starting) {
-                    for (auto ix = 0; ix < pin_count; ++ix) {
-                        Pin &p = all_pins[ix];
-                        if (p.on_update) {
-                            (*p.on_update)(&p, 0ms);
-                        }
-                        if (p.on_change) {
-                            (*p.on_change)(&p, 0ms);
-                        }
-                        recurse_components(this, [](Device *dev) {
-                            if (dev->simulate_device) {
-                                (*dev->simulate_device)(dev, 0ms);
-                            }
-                        });
-                    }
-                    for (auto ix = 0; ix < pin_count; ++ix) {
-                        all_pins[ix].new_state = all_pins[ix].state;
-                        all_pins[ix].new_driving = all_pins[ix].driving;
-                    }
-                }
-                auto now { std::chrono::high_resolution_clock::now() };
+                auto             now { std::chrono::high_resolution_clock::now() };
                 simulate(now - start);
                 if (status == SimStatus::Starting) {
                     status = SimStatus::Started;
