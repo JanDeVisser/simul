@@ -103,7 +103,6 @@ std::thread Circuit::start_simulation()
 {
     std::unique_lock lock(yield_mutex);
 
-    std::println(std::cout, "1");
     for (auto ix = 0; ix < pin_count; ++ix) {
         Pin &p = all_pins[ix];
         if (p.on_update) {
@@ -118,12 +117,10 @@ std::thread Circuit::start_simulation()
             (*dev->simulate_device)(dev, 0ms);
         }
     });
-    std::println(std::cout, "2");
     for (auto ix = 0; ix < pin_count; ++ix) {
         all_pins[ix].new_state = all_pins[ix].state;
         all_pins[ix].new_driving = all_pins[ix].driving;
     }
-    std::println(std::cout, "3");
 
     std::thread t { [&]() {
         if (status != SimStatus::Unstarted && status != SimStatus::Done) {
